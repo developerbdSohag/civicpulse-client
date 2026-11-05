@@ -40,7 +40,11 @@ async function apiRequest<T = any>(
   }));
 
   if (!response.ok) {
-    throw new Error(data.message || `Request failed with status ${response.status}`);
+    const error: any = new Error(data.message || `Request failed with status ${response.status}`);
+    error.data = data;
+    error.notRegistered = data.notRegistered;
+    error.status = response.status;
+    throw error;
   }
 
   return data;
@@ -59,7 +63,7 @@ export const authAPI = {
       body: JSON.stringify(payload),
     }),
 
-  googleAuth: (payload: { name: string; email: string; photoURL?: string; googleId?: string }) =>
+  googleAuth: (payload: { email: string }) =>
     apiRequest<{ success: boolean; message: string; user: User; token: string }>('/auth/google', {
       method: 'POST',
       body: JSON.stringify(payload),

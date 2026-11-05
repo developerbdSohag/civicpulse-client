@@ -85,8 +85,6 @@
 
 ---
 
-## 👥 Demo Test Accounts
-For quick testing and evaluation:
-- **Organizer**: `organizer@civicpulse.org` | Password: `CivicPulse@2026`
-- **Volunteer**: `volunteer@civicpulse.org` | Password: `CivicPulse@2026`
-- **Google Sign-In**: Click "Sign in with Google" on the login page for instantaneous one-click authentication.
+## 🔐 Authentication & Sign-In
+- **Email & Password**: Register with full name, email, optional photoURL, and password (requires uppercase, lowercase, minimum 6 characters).
+- **Google Sign-In**: Click "Sign in with Google" to authenticate with your Google account. If your email is registered, you will automatically log in. If not yet registered, you will be prompted to complete registration with your email pre-filled.

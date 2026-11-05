@@ -1,21 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { HeartHandshake, User, Mail, Image as ImageIcon, Lock, UserPlus, ArrowRight, Loader2, Check, AlertCircle } from 'lucide-react';
+import {
+  HeartHandshake,
+  User,
+  Mail,
+  Image as ImageIcon,
+  Lock,
+  UserPlus,
+  ArrowRight,
+  Loader2,
+  Check,
+  AlertCircle,
+  Info,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function RegisterPage() {
+function RegisterContent() {
   const { register } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const queryEmail = searchParams.get('email') || '';
+  const queryName = searchParams.get('name') || '';
+
+  const [name, setName] = useState(queryName);
+  const [email, setEmail] = useState(queryEmail);
   const [photoURL, setPhotoURL] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (queryEmail) setEmail(queryEmail);
+    if (queryName) setName(queryName);
+  }, [queryEmail, queryName]);
 
   // Dynamic Password Validation Checks
   const hasUpperCase = /[A-Z]/.test(password);
@@ -82,6 +103,16 @@ export default function RegisterPage() {
             Join thousands of volunteers organizing social change
           </p>
         </div>
+
+        {/* Pre-filled Notice if redirected from Google login */}
+        {queryEmail && (
+          <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span>
+              Setting up your account for <strong>{queryEmail}</strong>. Please choose your name and password to complete registration.
+            </span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -225,5 +256,19 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[85vh] flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+        </div>
+      }
+    >
+      <RegisterContent />
+    </Suspense>
   );
 }
