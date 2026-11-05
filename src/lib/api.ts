@@ -1,6 +1,11 @@
 import { ApiResponse, EventItem, RSVPItem, User, Attendee } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+};
 
 const getAuthToken = (): string | null => {
   if (typeof window !== 'undefined') {
@@ -13,6 +18,7 @@ async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const baseUrl = getBaseUrl();
   const token = getAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -23,7 +29,7 @@ async function apiRequest<T = any>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
     headers,
   });

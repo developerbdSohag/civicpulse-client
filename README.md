@@ -2,9 +2,9 @@
 
 **CivicPulse** is a modern, responsive, full-stack community-driven event management platform designed to empower citizens, youth volunteers, and grassroots social organizations to create, discover, join, and track impactful humanitarian initiatives in their local areas.
 
-🌐 **Live Site URL**: [https://civicpulse-social.vercel.app](https://civicpulse-social.vercel.app) *(Deployment ready for Vercel)*  
-🔗 **Backend Repository**: [https://github.com/your-username/civicpulse-server](https://github.com/your-username/civicpulse-server)  
-🔗 **Client Repository**: [https://github.com/your-username/civicpulse-client](https://github.com/your-username/civicpulse-client)
+🌐 **Live Site URL**: [https://3c2c81bb29851d.lhr.life](https://3c2c81bb29851d.lhr.life)  
+🔗 **Client Repository**: [https://github.com/developerbdSohag/civicpulse-client](https://github.com/developerbdSohag/civicpulse-client)  
+🔗 **Server Repository**: [https://github.com/developerbdSohag/civicpulse-server](https://github.com/developerbdSohag/civicpulse-server)  
 
 ---
 
