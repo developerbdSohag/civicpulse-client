@@ -1,10 +1,13 @@
 import { ApiResponse, EventItem, RSVPItem, User, Attendee } from '@/types';
 
 const getBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
   if (typeof window !== 'undefined') {
     return '/api';
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  return 'http://localhost:5000/api';
 };
 
 const getAuthToken = (): string | null => {
