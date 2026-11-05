@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CivicPulse — Community-Driven Social Development Events Platform
 
-## Getting Started
+**CivicPulse** is a modern, responsive, full-stack community-driven event management platform designed to empower citizens, youth volunteers, and grassroots social organizations to create, discover, join, and track impactful humanitarian initiatives in their local areas.
 
-First, run the development server:
+🌐 **Live Site URL**: [https://civicpulse-social.vercel.app](https://civicpulse-social.vercel.app) *(Deployment ready for Vercel)*  
+🔗 **Backend Repository**: [https://github.com/your-username/civicpulse-server](https://github.com/your-username/civicpulse-server)  
+🔗 **Client Repository**: [https://github.com/your-username/civicpulse-client](https://github.com/your-username/civicpulse-client)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌟 Top 5 Website Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Hyperlocal Humanitarian Event Discovery**:
+   - Discover real-time community initiatives filtered strictly for upcoming dates (past events are automatically excluded).
+   - Instant search by title or location (e.g. *Mirpur 10*, *Mohammadpur*, *Hatirjheel*, *Uttara*) and category filtering (Winter Drive, Tree Plantation, Cleanliness, Food Aid, Free Health Camps).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **One-Click Functional RSVP with Social Proof & Confetti**:
+   - Community members can join any upcoming social service event with a single click, triggering celebratory visual feedback and instantly updating volunteer rosters.
+   - Includes full protection: guest visitors can view event details publicly, but are seamlessly guided to authenticate before joining.
 
-## Learn More
+3. **Organizer Event Management & Strict Access Control**:
+   - Registered organizers can create initiatives with future-date validation, preset high-resolution photography, and capacity targets.
+   - Dedicated "Manage Events" dashboard allowing organizers to update event details or delete initiatives with immediate RSVP cascading cleanup. Only the event author can modify their events.
 
-To learn more about Next.js, take a look at the following resources:
+4. **Dedicated Joined Events Timeline & Calendar Export**:
+   - Volunteers have a personal "Joined Events" dashboard sorted chronologically by event date.
+   - One-click `.ics` calendar file generation allows volunteers to add events directly to Google Calendar, Apple Calendar, or Outlook.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **Universal Dark & Light Theme Customization & Loading Skeletons**:
+   - Complete system-wide theme toggling with smooth transitions and persistent local preferences.
+   - High-fidelity animated loading skeletons across Home, Event Catalog, Event Details, Manage Events, and User Profile pages to guarantee zero layout shifts and an exceptional user experience.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Additional Standout Features
+- **Profile View & Customization**: Update display name, profile avatar URL, volunteer bio, contact phone, and location with live participation statistics (Events Organized vs. Events Joined).
+- **Interactive Volunteer Rosters**: Shows avatars and names of joined neighbors on each event details page to inspire collective action.
+- **Client Session Hydration**: Persistent JWT storage and state restoration preventing unwanted login redirects on page refresh across all private routes (`/create-event`, `/manage-events`, `/joined-events`, `/profile`).
+- **Modern Social Branding**: Updated with the new X brand icon (replacing legacy Twitter bird logo).
+- **Strict Validation & Sonner Toasts**: Password criteria validation (minimum 6 characters, uppercase, and lowercase letters) with real-time feedback indicators; zero default browser alerts.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💻 Tech Stack
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom Dark / Light variant themes
+- **Icons**: Lucide React
+- **Notifications**: Sonner (Rich Toast Notifications)
+- **Delight Effects**: Canvas Confetti
+- **Authentication**: JWT & MongoDB user sessions with seamless hydration
+
+---
+
+## 🛠️ Local Setup & Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/civicpulse-client.git
+   cd civicpulse-client
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables**:
+   Create a `.env.local` file:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   ```
+
+4. **Run the Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+5. **Build for Production**:
+   ```bash
+   npm run build
+   npm start
+   ```
+
+---
+
+## 👥 Demo Test Accounts
+For quick testing and evaluation:
+- **Organizer**: `organizer@civicpulse.org` | Password: `CivicPulse@2026`
+- **Volunteer**: `volunteer@civicpulse.org` | Password: `CivicPulse@2026`
+- **Google Sign-In**: Click "Sign in with Google" on the login page for instantaneous one-click authentication.
