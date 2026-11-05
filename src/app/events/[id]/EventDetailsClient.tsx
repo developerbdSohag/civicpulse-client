@@ -207,7 +207,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
       </div>
 
       {/* Hero Banner Image */}
-      <div className="relative w-full h-72 sm:h-96 lg:h-[450px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800">
+      <div className="relative w-full h-72 sm:h-96 lg:h-[450px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800" style={{ position: 'relative', width: '100%', minHeight: '18rem', maxHeight: '450px' }}>
         <Image
           src={event.thumbnail}
           alt={event.title}
@@ -305,15 +305,15 @@ export default function EventDetailsClient({ id }: { id: string }) {
                     key={index}
                     className="flex items-center gap-2.5 p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800"
                   >
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-200">
-                      <Image
-                        src={attendee.userPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                        alt={attendee.userName}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
+                    <Image
+                      src={attendee.userPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
+                      alt={attendee.userName}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
+                      style={{ width: '32px', height: '32px', borderRadius: '9999px', objectFit: 'cover' }}
+                      unoptimized
+                    />
                     <span className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                       {attendee.userName}
                     </span>
@@ -428,15 +428,15 @@ export default function EventDetailsClient({ id }: { id: string }) {
               Initiative Organizer
             </h4>
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                <Image
-                  src={event.creatorPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                  alt={event.creatorName}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
+              <Image
+                src={event.creatorPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
+                alt={event.creatorName}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover shrink-0"
+                style={{ width: '48px', height: '48px', borderRadius: '9999px', objectFit: 'cover' }}
+                unoptimized
+              />
               <div className="truncate">
                 <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                   {event.creatorName}

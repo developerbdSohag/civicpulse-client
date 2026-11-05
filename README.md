@@ -2,7 +2,7 @@
 
 **CivicPulse** is a modern, responsive, full-stack community-driven event management platform designed to empower citizens, youth volunteers, and grassroots social organizations to create, discover, join, and track impactful humanitarian initiatives in their local areas.
 
-🌐 **Live Site URL**: [https://3c2c81bb29851d.lhr.life](https://3c2c81bb29851d.lhr.life)  
+🌐 **Live Site URL**: [https://transactions-excluding-treasure-thin.trycloudflare.com](https://transactions-excluding-treasure-thin.trycloudflare.com)  
 🔗 **Client Repository**: [https://github.com/developerbdSohag/civicpulse-client](https://github.com/developerbdSohag/civicpulse-client)  
 🔗 **Server Repository**: [https://github.com/developerbdSohag/civicpulse-server](https://github.com/developerbdSohag/civicpulse-server)  
 

@@ -122,15 +122,15 @@ export default function ProfilePage() {
               
               {/* Profile Overview Card */}
               <div className="p-6 rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm text-center space-y-4">
-                <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-emerald-500 shadow-md">
-                  <Image
-                    src={photoURL || user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                    alt={name || 'User Avatar'}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
+                <Image
+                  src={photoURL || user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
+                  alt={name || 'User Avatar'}
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-emerald-500 shadow-md"
+                  style={{ width: '96px', height: '96px', borderRadius: '9999px', objectFit: 'cover' }}
+                  unoptimized
+                />
 
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">

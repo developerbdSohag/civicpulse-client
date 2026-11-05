@@ -240,14 +240,14 @@ export default function ManageEventsPage() {
                       {/* Title & Thumbnail */}
                       <td className="py-4 px-4 sm:px-6">
                         <div className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-gray-200">
-                            <Image
-                              src={evt.thumbnail}
-                              alt={evt.title}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
+                          <Image
+                            src={evt.thumbnail}
+                            alt={evt.title}
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 rounded-xl object-cover shrink-0"
+                            style={{ width: '48px', height: '48px', borderRadius: '0.75rem', objectFit: 'cover' }}
+                          />
                           <div className="min-w-0">
                             <Link
                               href={`/events/${evt._id}`}

@@ -159,7 +159,7 @@ export default function HomePage() {
             {/* Right Column: Hero Visual Showcase */}
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-md lg:max-w-none">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800 aspect-[4/5]">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800 aspect-[4/5]" style={{ position: 'relative', width: '100%', aspectRatio: '4/5' }}>
                   <Image
                     src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1000&q=80"
                     alt="Volunteers distributing relief"
@@ -331,6 +331,7 @@ export default function HomePage() {
               <div
                 key={index}
                 className="group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+                style={{ position: 'relative', width: '100%', height: '18rem' }}
               >
                 <Image
                   src={item.image}
@@ -376,14 +377,14 @@ export default function HomePage() {
               &quot;Distributing 600 thermal jackets in Mirpur was the most rewarding experience of my winter. CivicPulse made team coordination effortless.&quot;
             </p>
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                  alt="Tahmina"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <Image
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+                alt="Tahmina"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover shrink-0"
+                style={{ width: '40px', height: '40px', borderRadius: '9999px', objectFit: 'cover' }}
+              />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">Tahmina Rahman</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Dhaka Youth Volunteers</p>
@@ -397,14 +398,14 @@ export default function HomePage() {
               &quot;Our lake cleanup at Hatirjheel brought 80+ strangers together. We removed 400kg of waste and made new lifelong friends along the way.&quot;
             </p>
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
-                  alt="Fahim"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <Image
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
+                alt="Fahim"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover shrink-0"
+                style={{ width: '40px', height: '40px', borderRadius: '9999px', objectFit: 'cover' }}
+              />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">Fahim Ahmed</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Green City Initiative</p>
@@ -418,14 +419,14 @@ export default function HomePage() {
               &quot;As a medical student, conducting free eye screenings at Korail was profoundly touching. The platform helped us reach exactly who needed it.&quot;
             </p>
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=150&q=80"
-                  alt="Dr. Ariful"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <Image
+                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=150&q=80"
+                alt="Dr. Ariful"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover shrink-0"
+                style={{ width: '40px', height: '40px', borderRadius: '9999px', objectFit: 'cover' }}
+              />
               <div>
                 <p className="text-sm font-bold text-gray-900 dark:text-white">Dr. Kazi Ariful Islam</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Medical Camp Coordinator</p>

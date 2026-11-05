@@ -317,7 +317,7 @@ export default function CreateEventPage() {
 
               {/* Image Preview */}
               {thumbnail && (
-                <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100">
+                <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100" style={{ position: 'relative', width: '100%', height: '11rem' }}>
                   <Image
                     src={thumbnail}
                     alt="Event preview"
@@ -350,14 +350,14 @@ export default function CreateEventPage() {
 
             {/* Organizer Note */}
             <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 bg-gray-200">
-                <Image
-                  src={user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                  alt={user?.name || 'Organizer'}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <Image
+                src={user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
+                alt={user?.name || 'Organizer'}
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full object-cover shrink-0"
+                style={{ width: '40px', height: '40px', borderRadius: '9999px', objectFit: 'cover' }}
+              />
               <div className="text-xs">
                 <p className="font-semibold text-gray-900 dark:text-white">
                   Publishing as: {user?.name} ({user?.email})

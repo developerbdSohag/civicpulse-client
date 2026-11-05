@@ -124,7 +124,7 @@ export default function JoinedEventsPage() {
                   key={rsvp._id}
                   className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden flex flex-col justify-between h-[420px] hover:shadow-lg transition-all"
                 >
-                  <div className="relative h-44 w-full bg-gray-100 dark:bg-gray-800">
+                  <div className="relative h-44 w-full bg-gray-100 dark:bg-gray-800" style={{ position: 'relative', width: '100%', height: '11rem' }}>
                     <Image
                       src={rsvp.eventThumbnail}
                       alt={rsvp.eventTitle}
