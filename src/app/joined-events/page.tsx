@@ -16,7 +16,9 @@ import {
   ArrowRight,
   XCircle,
   ExternalLink,
-  Sparkles,
+  AlertTriangle,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,13 +26,18 @@ export default function JoinedEventsPage() {
   const { user } = useAuth();
   const [joinedList, setJoinedList] = useState<RSVPItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelingItem, setCancelingItem] = useState<{ eventId: string; title: string } | null>(null);
+  const [isCanceling, setIsCanceling] = useState(false);
 
   const fetchJoined = async () => {
     try {
       setLoading(true);
       const res = await rsvpAPI.getMyJoined();
       if (res.success && res.joinedEvents) {
-        setJoinedList(res.joinedEvents);
+        const sorted = [...res.joinedEvents].sort(
+          (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+        );
+        setJoinedList(sorted);
       }
     } catch (err: any) {
       toast.error('Failed to load your joined events.');
@@ -45,26 +52,29 @@ export default function JoinedEventsPage() {
     }
   }, [user]);
 
-  const handleCancelRsvp = async (eventId: string, title: string) => {
-    if (!confirm(`Are you sure you want to cancel your participation for "${title}"?`)) {
-      return;
-    }
+  const confirmCancelRsvp = async () => {
+    if (!cancelingItem) return;
+    const { eventId, title } = cancelingItem;
 
     try {
+      setIsCanceling(true);
       const res = await rsvpAPI.leave(eventId);
       if (res.success) {
-        toast.info(`RSVP canceled for ${title}`);
+        toast.info(`Participation canceled for "${title}"`);
         setJoinedList((prev) =>
           prev.filter((item) => {
             const id = typeof item.eventId === 'string' ? item.eventId : (item.eventId as any)?._id || item._id;
             return id !== eventId && item.eventId !== eventId;
           })
         );
+        setCancelingItem(null);
       } else {
         toast.error(res.message || 'Failed to cancel RSVP.');
       }
     } catch (err: any) {
       toast.error(err.message || 'Error canceling RSVP.');
+    } finally {
+      setIsCanceling(false);
     }
   };
 
@@ -163,7 +173,7 @@ export default function JoinedEventsPage() {
 
                     <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
                       <button
-                        onClick={() => handleCancelRsvp(eventId, rsvp.eventTitle)}
+                        onClick={() => setCancelingItem({ eventId, title: rsvp.eventTitle })}
                         className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <XCircle className="w-3.5 h-3.5" />
@@ -182,6 +192,52 @@ export default function JoinedEventsPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* CANCEL RSVP MODAL */}
+        {cancelingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+            <div className="relative w-full max-w-md rounded-3xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-gray-900 p-6 sm:p-7 shadow-2xl space-y-5 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Cancel Participation?
+                </h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Are you sure you want to cancel your attendance for <span className="font-semibold text-gray-900 dark:text-gray-200">&quot;{cancelingItem.title}&quot;</span>? You can rejoin anytime from the upcoming events page.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setCancelingItem(null)}
+                  disabled={isCanceling}
+                  className="py-2.5 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  Keep Attending
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmCancelRsvp}
+                  disabled={isCanceling}
+                  className="py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  {isCanceling ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Canceling...</span>
+                    </>
+                  ) : (
+                    <span>Yes, Cancel RSVP</span>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

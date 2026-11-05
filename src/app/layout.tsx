@@ -20,6 +20,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function() {
+              try {
+                var saved = localStorage.getItem('civicpulse_theme');
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (saved === 'dark' || (!saved && prefersDark)) {
+                  document.documentElement.classList.add('dark');
+                  if (document.body) document.body.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  if (document.body) document.body.classList.remove('dark');
+                }
+              } catch (e) {}
+            })();`,
+          }}
+        />
+      </head>
       <body className="antialiased selection:bg-emerald-500 selection:text-white flex flex-col min-h-screen">
         <ThemeProvider>
           <AuthProvider>

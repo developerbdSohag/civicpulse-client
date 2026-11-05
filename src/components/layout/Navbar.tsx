@@ -331,6 +331,24 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  {theme === 'light' ? (
+                    <Moon className="w-4 h-4 text-gray-600" />
+                  ) : (
+                    <Sun className="w-4 h-4 text-amber-400" />
+                  )}
+                  <span>Appearance</span>
+                </span>
+                <span className="text-xs px-2 py-0.5 rounded-md font-semibold bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
+                  {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="pt-3 border-t border-gray-100 dark:border-gray-800">

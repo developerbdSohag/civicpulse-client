@@ -42,8 +42,14 @@ function EventsContent() {
       });
 
       if (res.success && res.events) {
-        setEvents(res.events);
-        setTotalCount(res.totalCount || res.events.length);
+        let evts = [...res.events];
+        if (sort === 'date_asc') {
+          evts.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+        } else if (sort === 'date_desc') {
+          evts.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
+        }
+        setEvents(evts);
+        setTotalCount(res.totalCount || evts.length);
       }
     } catch (err) {
       console.error('Error fetching upcoming events:', err);

@@ -23,8 +23,26 @@ import {
   AlertCircle,
   Loader2,
   Heart,
+  Edit3,
+  Trash2,
+  X,
+  AlertTriangle,
+  ImageIcon,
+  FileText,
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const EVENT_TYPES = [
+  'Donation',
+  'Cleanup',
+  'Plantation',
+  'Healthcare',
+  'Education',
+  'Relief Aid',
+  'Winter Drive',
+  'Food Aid',
+  'Other',
+];
 
 export default function EventDetailsClient({ id }: { id: string }) {
   const { user } = useAuth();
@@ -35,6 +53,111 @@ export default function EventDetailsClient({ id }: { id: string }) {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Edit Modal State
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    eventType: 'Donation',
+    thumbnail: '',
+    location: '',
+    eventDate: '',
+    targetVolunteers: 50,
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Delete Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isCreator = Boolean(
+    user && event && user.email.toLowerCase() === event.creatorEmail.toLowerCase()
+  );
+
+  const openEditModal = () => {
+    if (!event) return;
+    const d = new Date(event.eventDate);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    const formatted = d.toISOString().slice(0, 16);
+
+    setEditForm({
+      title: event.title,
+      description: event.description,
+      eventType: event.eventType,
+      thumbnail: event.thumbnail,
+      location: event.location,
+      eventDate: formatted,
+      targetVolunteers: event.targetVolunteers || 50,
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleUpdateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!event) return;
+
+    if (!editForm.title.trim() || editForm.title.length < 5) {
+      toast.error('Title must be at least 5 characters.');
+      return;
+    }
+
+    if (!editForm.description.trim() || editForm.description.length < 15) {
+      toast.error('Description must be at least 15 characters.');
+      return;
+    }
+
+    const chosenDate = new Date(editForm.eventDate);
+    if (chosenDate <= new Date()) {
+      toast.error('Event date must be in the future. Past dates cannot be selected.');
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+      const res = await eventsAPI.update(event._id, {
+        title: editForm.title.trim(),
+        description: editForm.description.trim(),
+        eventType: editForm.eventType,
+        thumbnail: editForm.thumbnail.trim(),
+        location: editForm.location.trim(),
+        eventDate: chosenDate.toISOString(),
+        targetVolunteers: editForm.targetVolunteers,
+      });
+
+      if (res.success && res.event) {
+        toast.success('Event updated successfully!');
+        setEvent(res.event);
+        setEditModalOpen(false);
+      } else {
+        toast.error(res.message || 'Failed to update event.');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error updating event.');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!event) return;
+
+    try {
+      setIsDeleting(true);
+      const res = await eventsAPI.delete(event._id);
+      if (res.success) {
+        toast.success('Event has been permanently deleted.');
+        setDeleteModalOpen(false);
+        router.push('/events');
+      } else {
+        toast.error(res.message || 'Failed to delete event.');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error deleting event.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchEventDetails() {
@@ -326,6 +449,41 @@ export default function EventDetailsClient({ id }: { id: string }) {
 
         {/* Right Column (4 cols): Sticky RSVP & Action Card */}
         <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+          
+          {/* Organizer Control Card (Only visible to Event Creator) */}
+          {isCreator && (
+            <div className="p-5 rounded-3xl border-2 border-emerald-500/50 bg-emerald-50/80 dark:bg-emerald-950/40 shadow-md space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  Organizer Control
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200">
+                  Your Event
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                You created this initiative. You can edit the schedule, update details, or delete this event.
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  onClick={openEditModal}
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Event</span>
+                </button>
+                <button
+                  onClick={() => setDeleteModalOpen(true)}
+                  className="w-full py-2.5 px-3 rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Event</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="p-6 rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
               <div>
@@ -449,6 +607,200 @@ export default function EventDetailsClient({ id }: { id: string }) {
           </div>
         </div>
       </div>
+
+      {/* EDIT EVENT MODAL */}
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 flex items-center justify-center">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Edit Event</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Update your community initiative details</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateSubmit} className="space-y-4 text-left">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Event Title *
+                </label>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Event Type *
+                  </label>
+                  <select
+                    value={editForm.eventType}
+                    onChange={(e) => setEditForm({ ...editForm, eventType: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  >
+                    {EVENT_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Event Date & Time (Future Date) *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={editForm.eventDate}
+                    onChange={(e) => setEditForm({ ...editForm, eventDate: e.target.value })}
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Meeting Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Target Volunteers
+                  </label>
+                  <input
+                    type="number"
+                    min="5"
+                    value={editForm.targetVolunteers}
+                    onChange={(e) => setEditForm({ ...editForm, targetVolunteers: parseInt(e.target.value, 10) || 50 })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Thumbnail Image URL *
+                </label>
+                <input
+                  type="url"
+                  value={editForm.thumbnail}
+                  onChange={(e) => setEditForm({ ...editForm, thumbnail: e.target.value })}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Description *
+                </label>
+                <textarea
+                  rows={4}
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  {savingEdit ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving Changes...</span>
+                    </>
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-3xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-gray-900 p-6 sm:p-7 shadow-2xl space-y-5 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 mx-auto flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Delete This Event?
+              </h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-gray-200">&quot;{event.title}&quot;</span>? This action cannot be undone and will remove all attendee records.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="py-2.5 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              >
+                No, Keep It
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Yes, Delete Event</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

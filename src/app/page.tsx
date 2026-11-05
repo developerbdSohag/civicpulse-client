@@ -34,7 +34,10 @@ export default function HomePage() {
         // Using limit=6 which triggers MongoDB .limit(6) on the backend
         const res = await eventsAPI.getUpcoming({ limit: 6, sort: 'date_asc' });
         if (res.success && res.events) {
-          setRecentEvents(res.events);
+          const sorted = [...res.events].sort(
+            (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+          );
+          setRecentEvents(sorted);
         }
       } catch (err) {
         console.error('Failed to load recent events:', err);

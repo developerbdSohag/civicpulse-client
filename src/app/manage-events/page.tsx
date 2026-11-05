@@ -64,7 +64,10 @@ export default function ManageEventsPage() {
       setLoading(true);
       const res = await eventsAPI.getMyCreated();
       if (res.success && res.events) {
-        setMyEvents(res.events);
+        const sorted = [...res.events].sort(
+          (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+        );
+        setMyEvents(sorted);
       }
     } catch (err: any) {
       toast.error('Failed to load your organized events.');
