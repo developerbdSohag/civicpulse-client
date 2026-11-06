@@ -1,13 +1,10 @@
 import { ApiResponse, EventItem, RSVPItem, User, Attendee } from '@/types';
 
 const getBaseUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
+  if (process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('trycloudflare.com')) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  if (typeof window !== 'undefined') {
-    return '/api';
-  }
-  return 'http://localhost:5000/api';
+  return '/api';
 };
 
 const getAuthToken = (): string | null => {

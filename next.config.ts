@@ -10,12 +10,15 @@ const nextConfig: NextConfig = {
     },
   },
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND_INTERNAL_URL || 'http://localhost:5000'}/api/:path*`,
-      },
-    ];
+    if (process.env.BACKEND_INTERNAL_URL) {
+      return [
+        {
+          source: '/api/:path*',
+          destination: `${process.env.BACKEND_INTERNAL_URL}/api/:path*`,
+        },
+      ];
+    }
+    return [];
   },
   images: {
     remotePatterns: [
