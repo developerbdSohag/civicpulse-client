@@ -14,6 +14,7 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (updatedFields: Partial<User>) => void;
   refreshUser: () => Promise<void>;
+  handleAuthSuccess: (userData: User, authToken: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -150,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         updateUser,
         refreshUser,
+        handleAuthSuccess,
       }}
     >
       {children}

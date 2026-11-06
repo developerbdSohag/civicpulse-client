@@ -71,6 +71,31 @@ export const authAPI = {
 
   getMe: () =>
     apiRequest<{ success: boolean; user: User }>('/auth/me'),
+
+  sendVerificationCode: (payload: { email: string; name?: string; photoURL?: string }) =>
+    apiRequest<{
+      success: boolean;
+      message: string;
+      code?: string;
+      email?: string;
+      isRegistered?: boolean;
+      deliveredVia?: 'smtp' | 'simulated';
+    }>('/auth/send-verification-code', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  verifyCode: (payload: {
+    email: string;
+    code: string;
+    name?: string;
+    password?: string;
+    photoURL?: string;
+  }) =>
+    apiRequest<{ success: boolean; message: string; user: User; token: string }>('/auth/verify-code', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };
 
 export const eventsAPI = {

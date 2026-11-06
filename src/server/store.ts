@@ -9,10 +9,19 @@ export interface StoredUser extends User {
   createdAt: string;
 }
 
+export interface VerificationCode {
+  email: string;
+  code: string;
+  name: string;
+  photoURL?: string;
+  expiresAt: number;
+}
+
 interface InMemoryStore {
   users: Map<string, StoredUser>;
   events: Map<string, EventItem>;
   rsvps: Map<string, RSVPItem>;
+  verificationCodes: Map<string, VerificationCode>;
   initialized: boolean;
 }
 
@@ -27,8 +36,12 @@ function getStore(): InMemoryStore {
       users: new Map(),
       events: new Map(),
       rsvps: new Map(),
+      verificationCodes: new Map(),
       initialized: false,
     };
+  }
+  if (!global.__civicpulse_store__.verificationCodes) {
+    global.__civicpulse_store__.verificationCodes = new Map();
   }
   return global.__civicpulse_store__;
 }
@@ -292,6 +305,48 @@ export function updateUser(id: string, updates: Partial<StoredUser>): StoredUser
   const updated = { ...existing, ...updates };
   store.users.set(id, updated);
   return updated;
+}
+
+// Verification Code Helpers
+export function saveVerificationCode(data: { email: string; name?: string; photoURL?: string }): { code: string; expiresAt: number } {
+  initStore();
+  const store = getStore();
+  // 6-digit random code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // Valid for 10 minutes
+  const normalizedEmail = data.email.trim().toLowerCase();
+
+  store.verificationCodes.set(normalizedEmail, {
+    email: normalizedEmail,
+    code,
+    name: data.name || data.email.split('@')[0],
+    photoURL: data.photoURL,
+    expiresAt,
+  });
+
+  return { code, expiresAt };
+}
+
+export function verifyCode(email: string, code: string): { valid: boolean; message?: string; data?: VerificationCode } {
+  initStore();
+  const store = getStore();
+  const normalizedEmail = email.trim().toLowerCase();
+  const record = store.verificationCodes.get(normalizedEmail);
+
+  if (!record) {
+    return { valid: false, message: 'No verification code found for this email. Please request a new code.' };
+  }
+  if (Date.now() > record.expiresAt) {
+    store.verificationCodes.delete(normalizedEmail);
+    return { valid: false, message: 'Verification code has expired. Please request a new code.' };
+  }
+  if (record.code.trim() !== code.trim()) {
+    return { valid: false, message: 'Incorrect verification code. Please check your mailbox and try again.' };
+  }
+
+  // Code verified! Remove to prevent reuse
+  store.verificationCodes.delete(normalizedEmail);
+  return { valid: true, data: record };
 }
 
 // Event Helpers

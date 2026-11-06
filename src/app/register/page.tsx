@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { authAPI } from '@/lib/api';
 import {
   HeartHandshake,
   User,
@@ -18,9 +19,10 @@ import {
   Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import GoogleAccountChooserModal from '@/components/auth/GoogleAccountChooserModal';
+import EmailVerificationModal from '@/components/auth/EmailVerificationModal';
 
 function RegisterContent() {
-  const { register } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,6 +34,13 @@ function RegisterContent() {
   const [photoURL, setPhotoURL] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Verification modal state
+  const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+  const [dispatchedCode, setDispatchedCode] = useState<string | undefined>(undefined);
+
+  // Google Account Chooser modal
+  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   useEffect(() => {
     if (queryEmail) setEmail(queryEmail);
@@ -71,19 +80,31 @@ function RegisterContent() {
     }
 
     setLoading(true);
-    const result = await register(
-      name.trim(),
-      email.trim(),
-      password,
-      photoURL.trim() || undefined
-    );
-    setLoading(false);
 
-    if (result.success) {
-      toast.success(result.message || 'Account created successfully! Welcome to CivicPulse.');
-      router.push('/events');
-    } else {
-      toast.error(result.message || 'Registration failed. Please try again.');
+    try {
+      // Dispatch 6-digit verification code to the email
+      const res = await authAPI.sendVerificationCode({
+        email: email.trim(),
+        name: name.trim(),
+        photoURL: photoURL.trim() || undefined,
+      });
+
+      if (res.success) {
+        toast.info(`A 6-digit verification code was sent to ${email.trim()}.`);
+        setDispatchedCode(res.code);
+        setVerifyModalOpen(true);
+      } else {
+        if (res.isRegistered) {
+          toast.error(res.message);
+          router.push('/login');
+        } else {
+          toast.error(res.message || 'Failed to dispatch verification code.');
+        }
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Registration check failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,10 +173,10 @@ function RegisterContent() {
             </div>
           </div>
 
-          {/* Photo URL */}
+          {/* Photo URL (Optional) */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-              Profile Photo URL (optional)
+              Profile Photo URL <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
             <div className="relative">
               <ImageIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -163,13 +184,10 @@ function RegisterContent() {
                 type="url"
                 value={photoURL}
                 onChange={(e) => setPhotoURL(e.target.value)}
-                placeholder="https://images.unsplash.com/photo-..."
+                placeholder="https://images.unsplash.com/... (optional)"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
             </div>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-              Leave blank for a default avatar photo.
-            </p>
           </div>
 
           {/* Password */}
@@ -183,17 +201,14 @@ function RegisterContent() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters..."
+                placeholder="••••••••"
                 required
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
             </div>
 
-            {/* Live Password Criteria Visual Indicators */}
-            <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-gray-950/70 border border-gray-200 dark:border-gray-800 space-y-1.5 text-xs">
-              <p className="font-semibold text-gray-600 dark:text-gray-400 text-[11px]">
-                Password Requirements:
-              </p>
+            {/* Live Password Rules Feedback */}
+            <div className="mt-2.5 space-y-1.5 text-xs">
               <div className="flex items-center gap-1.5">
                 {hasMinLength ? (
                   <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -233,7 +248,10 @@ function RegisterContent() {
             className="w-full btn-magnetic btn-steel-primary py-3.5 px-4 rounded-xl text-sm font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Sending Verification Code...</span>
+              </>
             ) : (
               <>
                 <UserPlus className="w-4 h-4" />
@@ -242,6 +260,42 @@ function RegisterContent() {
             )}
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center">
+          <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
+          <span className="bg-white dark:bg-gray-900 px-3 text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">
+            Or register with
+          </span>
+          <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
+        </div>
+
+        {/* Google 1-Click Button */}
+        <button
+          type="button"
+          onClick={() => setGoogleModalOpen(true)}
+          className="w-full btn-magnetic btn-steel-secondary py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+            />
+          </svg>
+          <span>Sign up with Google</span>
+        </button>
 
         {/* Redirect to Login Page */}
         <p className="text-center text-xs text-gray-600 dark:text-gray-400">
@@ -255,6 +309,24 @@ function RegisterContent() {
           </Link>
         </p>
       </div>
+
+      {/* EMAIL VERIFICATION BOX MODAL */}
+      <EmailVerificationModal
+        isOpen={verifyModalOpen}
+        onClose={() => setVerifyModalOpen(false)}
+        email={email.trim()}
+        name={name.trim()}
+        photoURL={photoURL.trim() || undefined}
+        initialCode={dispatchedCode}
+        onSuccessRedirect="/events"
+      />
+
+      {/* GOOGLE ACCOUNT CHOOSER MODAL */}
+      <GoogleAccountChooserModal
+        isOpen={googleModalOpen}
+        onClose={() => setGoogleModalOpen(false)}
+        onSuccessRedirect="/events"
+      />
     </div>
   );
 }
