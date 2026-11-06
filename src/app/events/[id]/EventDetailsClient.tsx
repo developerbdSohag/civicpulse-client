@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import SafeImage from '@/components/common/SafeImage';
+import UserAvatar from '@/components/common/UserAvatar';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -428,14 +429,10 @@ export default function EventDetailsClient({ id }: { id: string }) {
                     key={index}
                     className="flex items-center gap-2.5 p-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800"
                   >
-                    <Image
-                      src={attendee.userPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                      alt={attendee.userName}
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover shrink-0"
-                      style={{ width: '32px', height: '32px', borderRadius: '9999px', objectFit: 'cover' }}
-                      unoptimized
+                    <UserAvatar
+                      src={attendee.userPhoto}
+                      name={attendee.userName}
+                      size={32}
                     />
                     <span className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                       {attendee.userName}
@@ -586,14 +583,11 @@ export default function EventDetailsClient({ id }: { id: string }) {
               Initiative Organizer
             </h4>
             <div className="flex items-center gap-3">
-              <Image
-                src={event.creatorPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                alt={event.creatorName}
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover shrink-0"
-                style={{ width: '48px', height: '48px', borderRadius: '9999px', objectFit: 'cover' }}
-                unoptimized
+              <UserAvatar
+                src={event.creatorPhoto}
+                name={event.creatorName}
+                size={48}
+                className="shrink-0 ring-2 ring-emerald-500/20"
               />
               <div className="truncate">
                 <p className="text-sm font-bold text-gray-900 dark:text-white truncate">

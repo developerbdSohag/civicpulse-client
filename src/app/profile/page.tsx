@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { profileAPI } from '@/lib/api';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { ProfileSkeleton } from '@/components/common/LoadingSkeleton';
+import UserAvatar from '@/components/common/UserAvatar';
 import {
   User as UserIcon,
   Mail,
@@ -19,8 +20,38 @@ import {
   Sparkles,
   Loader2,
   Image as ImageIcon,
+  Camera,
+  Upload,
+  RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const AVATAR_PRESETS = [
+  {
+    name: 'Volunteer 1',
+    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    name: 'Volunteer 2',
+    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    name: 'Volunteer 3',
+    url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    name: 'Volunteer 4',
+    url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    name: 'Volunteer 5',
+    url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    name: 'Volunteer 6',
+    url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80',
+  },
+];
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
@@ -35,6 +66,30 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file (PNG, JPG, WEBP).');
+      return;
+    }
+
+    if (file.size > 2.5 * 1024 * 1024) {
+      toast.error('Image size should be under 2.5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setPhotoURL(dataUrl);
+      toast.success('New photo loaded! Click "Save Profile Changes" below to save.');
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     async function loadProfile() {
@@ -122,14 +177,28 @@ export default function ProfilePage() {
               
               {/* Profile Overview Card */}
               <div className="p-6 rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm text-center space-y-4">
-                <Image
-                  src={photoURL || user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                  alt={name || 'User Avatar'}
-                  width={96}
-                  height={96}
-                  className="w-24 h-24 mx-auto rounded-full object-cover border-4 border-emerald-500 shadow-md"
-                  style={{ width: '96px', height: '96px', borderRadius: '9999px', objectFit: 'cover' }}
-                  unoptimized
+                <div className="relative inline-block mx-auto">
+                  <UserAvatar
+                    src={photoURL || user?.photoURL}
+                    name={name || user?.name}
+                    size={100}
+                    className="border-4 border-emerald-500 shadow-lg ring-4 ring-emerald-500/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Upload photo from device"
+                    className="absolute -bottom-1 -right-1 p-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-md ring-2 ring-white dark:ring-gray-900 transition-transform hover:scale-110 cursor-pointer"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
                 />
 
                 <div>
@@ -212,19 +281,87 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* Photo URL */}
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
-                      Avatar Image URL
-                    </label>
-                    <input
-                      type="url"
-                      value={photoURL}
-                      onChange={(e) => setPhotoURL(e.target.value)}
-                      placeholder="https://images.unsplash.com/..."
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                  {/* Profile Picture Option Section */}
+                  <div className="space-y-3 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <ImageIcon className="w-4 h-4 text-emerald-600" />
+                        Profile Picture Options
+                      </label>
+                      {photoURL && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPhotoURL('');
+                            toast.info('Switched to Initials Avatar style.');
+                          }}
+                          className="text-[11px] text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 font-medium underline cursor-pointer"
+                        >
+                          Use Initials
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Direct Upload Button */}
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all cursor-pointer"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Photo from Device</span>
+                      </button>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                        PNG, JPG, or WEBP (up to 2.5MB)
+                      </span>
+                    </div>
+
+                    {/* Quick Avatar Presets */}
+                    <div className="pt-2">
+                      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-2">
+                        Or pick a verified volunteer portrait:
+                      </p>
+                      <div className="grid grid-cols-6 gap-2">
+                        {AVATAR_PRESETS.map((preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setPhotoURL(preset.url);
+                              toast.success(`Selected ${preset.name}`);
+                            }}
+                            className={`relative h-11 w-11 rounded-full overflow-hidden border-2 transition-all cursor-pointer mx-auto ${
+                              photoURL === preset.url
+                                ? 'border-emerald-500 ring-2 ring-emerald-400/40 scale-105 shadow-md'
+                                : 'border-transparent opacity-70 hover:opacity-100 hover:border-gray-300 dark:hover:border-gray-700'
+                            }`}
+                            title={preset.name}
+                          >
+                            <img
+                              src={preset.url}
+                              alt={preset.name}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Custom URL Input */}
+                    <div className="pt-2 border-t border-gray-200/60 dark:border-gray-700/60">
+                      <label className="block text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        Or paste direct image URL:
+                      </label>
+                      <input
+                        type="url"
+                        value={photoURL}
+                        onChange={(e) => setPhotoURL(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
                   </div>
 
                   {/* Bio */}

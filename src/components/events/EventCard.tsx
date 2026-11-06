@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import SafeImage from '@/components/common/SafeImage';
+import UserAvatar from '@/components/common/UserAvatar';
 import Link from 'next/link';
 import { EventItem } from '@/types';
 import { Calendar, MapPin, Users, ArrowRight, Tag } from 'lucide-react';
@@ -92,14 +93,11 @@ export default function EventCard({ event }: EventCardProps) {
         {/* Card Footer: Organizer & Action Button */}
         <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <Image
-              src={event.creatorPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-              alt={event.creatorName}
-              width={28}
-              height={28}
-              className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200 dark:border-gray-700"
-              style={{ width: '28px', height: '28px', borderRadius: '9999px', objectFit: 'cover' }}
-              unoptimized
+            <UserAvatar
+              src={event.creatorPhoto}
+              name={event.creatorName}
+              size={28}
+              className="border border-gray-200 dark:border-gray-700"
             />
             <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
               {event.creatorName}

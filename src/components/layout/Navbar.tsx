@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import UserAvatar from '@/components/common/UserAvatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -142,14 +143,11 @@ export default function Navbar() {
                     aria-expanded={dropdownOpen}
                     aria-label="User menu"
                   >
-                    <Image
-                      src={user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                      alt={user.name || 'User Avatar'}
-                      width={36}
-                      height={36}
-                      className="w-9 h-9 rounded-full object-cover shrink-0"
-                      style={{ width: '36px', height: '36px', borderRadius: '9999px', objectFit: 'cover' }}
-                      unoptimized
+                    <UserAvatar
+                      src={user.photoURL}
+                      name={user.name}
+                      size={36}
+                      className="ring-2 ring-emerald-500/40"
                     />
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
 
@@ -263,14 +261,11 @@ export default function Navbar() {
         <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 pt-3 pb-6 space-y-3">
           {user && (
             <div className="flex items-center gap-3 p-3 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl mb-3">
-              <Image
-                src={user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
-                alt={user.name || 'User'}
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full object-cover shrink-0"
-                style={{ width: '40px', height: '40px', borderRadius: '9999px', objectFit: 'cover' }}
-                unoptimized
+              <UserAvatar
+                src={user.photoURL}
+                name={user.name}
+                size={40}
+                className="ring-2 ring-emerald-500/40 shrink-0"
               />
               <div className="truncate">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user.name}</p>
