@@ -297,7 +297,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
         </p>
         <Link
           href="/events"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm"
+          className="btn-magnetic btn-steel-primary gap-2 px-5 py-2.5 rounded-xl font-bold text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Upcoming Events</span>
@@ -465,14 +465,14 @@ export default function EventDetailsClient({ id }: { id: string }) {
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   onClick={openEditModal}
-                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  className="w-full btn-magnetic btn-steel-primary py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Event</span>
                 </button>
                 <button
                   onClick={() => setDeleteModalOpen(true)}
-                  className="w-full py-2.5 px-3 rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  className="w-full btn-magnetic py-2.5 px-3 rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Delete Event</span>
@@ -537,7 +537,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
                 <button
                   onClick={handleJoinEvent}
                   disabled={actionLoading}
-                  className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full btn-magnetic btn-steel-primary py-3.5 px-4 rounded-xl text-sm font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {actionLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -733,7 +733,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="btn-magnetic btn-steel-primary px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
                 >
                   {savingEdit ? (
                     <>
@@ -780,7 +780,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={isDeleting}
-                className="py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-md shadow-red-600/25 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="btn-magnetic py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/25 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 {isDeleting ? (
                   <>

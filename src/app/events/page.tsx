@@ -93,7 +93,7 @@ function EventsContent() {
 
         <Link
           href="/create-event"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 transition-all self-start md:self-auto shrink-0"
+          className="btn-magnetic btn-steel-primary gap-2 px-5 py-3 rounded-xl text-sm font-bold shadow-md self-start md:self-auto shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Host New Event</span>
@@ -118,7 +118,7 @@ function EventsContent() {
             </div>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors cursor-pointer"
+              className="btn-magnetic btn-steel-primary px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer"
             >
               Search
             </button>
@@ -150,10 +150,10 @@ function EventsContent() {
               key={cat}
               type="button"
               onClick={() => setSelectedType(cat)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              className={`btn-magnetic px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
                 selectedType === cat
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  ? 'btn-steel-primary font-bold'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200/60 dark:border-gray-700/60'
               }`}
             >
               {cat}

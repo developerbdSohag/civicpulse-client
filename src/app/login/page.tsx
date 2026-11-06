@@ -151,7 +151,7 @@ function LoginFormContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full btn-magnetic btn-steel-primary py-3 px-4 rounded-xl text-sm font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -180,7 +180,7 @@ function LoginFormContent() {
             setNotRegisteredError(null);
             setGoogleModalOpen(true);
           }}
-          className="w-full py-2.5 px-4 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-semibold transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+          className="w-full btn-magnetic btn-steel-secondary py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path

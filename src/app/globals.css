@@ -44,3 +44,143 @@ body {
 .dark ::-webkit-scrollbar-thumb {
   background: #334155;
 }
+
+/* ==========================================================================
+   Magnetic Steel Tactile Button System
+   Physics: Magnetic attraction & acceleration on hover, snap latch on click
+   ========================================================================== */
+
+:root {
+  --magnetic-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --magnetic-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Universal Magnetic Physics */
+.btn-magnetic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.26s var(--magnetic-spring),
+              box-shadow 0.26s var(--magnetic-spring),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+/* Magnet pulling toward cursor / steel (anticipatory lift + spring) */
+.btn-magnetic:hover {
+  transform: translateY(-2.5px) scale(1.02);
+}
+
+/* Solid magnetic contact snap (firm mechanical latch) */
+.btn-magnetic:active {
+  transform: translateY(1.5px) scale(0.975);
+  transition-duration: 0.08s;
+}
+
+.btn-magnetic:disabled {
+  transform: none !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none !important;
+}
+
+/* 1. Primary Lustrous Emerald Steel Button */
+.btn-steel-primary {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.35),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+.btn-steel-primary:hover {
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  box-shadow: 0 12px 28px -3px rgba(5, 150, 105, 0.45),
+              0 4px 12px -2px rgba(5, 150, 105, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.55),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+.btn-steel-primary:active {
+  box-shadow: 0 2px 6px rgba(4, 120, 87, 0.5) inset,
+              0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* 2. Secondary Frosted Steel Button */
+.btn-steel-secondary {
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06),
+              inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+.dark .btn-steel-secondary {
+  background: rgba(17, 24, 39, 0.85);
+  color: #f8fafc !important;
+  border: 1px solid rgba(75, 85, 99, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.btn-steel-secondary:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #059669;
+  color: #047857 !important;
+  box-shadow: 0 10px 24px -3px rgba(16, 185, 129, 0.2),
+              0 3px 6px rgba(0, 0, 0, 0.04),
+              inset 0 1px 0 #ffffff;
+}
+.dark .btn-steel-secondary:hover {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #34d399;
+  color: #34d399 !important;
+  box-shadow: 0 10px 24px -3px rgba(52, 211, 153, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.btn-steel-secondary:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12) inset;
+}
+
+/* 3. Pearl Steel Button (Newsletter & High-Contrast Callouts) */
+.btn-steel-pearl {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  color: #064e3b !important;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15),
+              0 2px 6px rgba(6, 78, 59, 0.15),
+              inset 0 1px 0 #ffffff;
+}
+.btn-steel-pearl:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #dcfce7 100%);
+  color: #022c22 !important;
+  border-color: #ffffff;
+  box-shadow: 0 14px 32px -4px rgba(0, 0, 0, 0.3),
+              0 6px 14px rgba(6, 78, 59, 0.25),
+              inset 0 1px 0 #ffffff;
+}
+.btn-steel-pearl:active {
+  box-shadow: 0 2px 6px rgba(6, 78, 59, 0.35) inset;
+}
+
+/* 4. Navbar Magnetic Navigation Pill */
+.nav-link-magnetic {
+  position: relative;
+  transition: transform 0.24s var(--magnetic-spring),
+              background-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.24s var(--magnetic-spring);
+}
+.nav-link-magnetic:hover {
+  transform: translateY(-1.5px) scale(1.02);
+}
+.nav-link-magnetic:active {
+  transform: translateY(1px) scale(0.98);
+}
+

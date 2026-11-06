@@ -410,7 +410,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer pt-3"
+                    className="w-full btn-magnetic btn-steel-primary py-3.5 px-4 rounded-xl text-sm font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {saving ? (
                       <Loader2 className="w-4 h-4 animate-spin" />

@@ -127,7 +127,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
                 <Link
                   href="/events"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all"
+                  className="w-full sm:w-auto btn-magnetic btn-steel-primary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold shadow-lg"
                 >
                   <CalendarCheck className="w-5 h-5" />
                   <span>Explore Upcoming Events</span>
@@ -135,7 +135,7 @@ export default function HomePage() {
 
                 <Link
                   href="/create-event"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-semibold border-2 border-emerald-600/40 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-all"
+                  className="w-full sm:w-auto btn-magnetic btn-steel-secondary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold"
                 >
                   <Heart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   <span>Host an Initiative</span>
@@ -277,10 +277,10 @@ export default function HomePage() {
 
           <Link
             href="/events"
-            className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 group"
+            className="btn-magnetic btn-steel-secondary gap-2 px-4 py-2.5 rounded-xl text-sm font-bold self-start md:self-auto shadow-sm"
           >
             <span>View All Upcoming Events</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -300,7 +300,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/create-event"
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 text-white shadow hover:bg-emerald-700 transition-colors"
+              className="btn-magnetic btn-steel-primary px-6 py-2.5 rounded-xl text-sm font-bold"
             >
               Create an Event
             </Link>
@@ -466,9 +466,10 @@ export default function HomePage() {
               />
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl text-sm font-bold bg-gray-900 hover:bg-black text-white shadow transition-colors shrink-0"
+                className="btn-magnetic btn-steel-pearl px-7 py-3 rounded-xl text-sm font-extrabold shrink-0 gap-2 flex items-center justify-center cursor-pointer shadow-lg"
               >
-                Subscribe Free
+                <Send className="w-4 h-4 text-emerald-800" />
+                <span>Subscribe Free</span>
               </button>
             </form>
 

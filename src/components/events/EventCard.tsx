@@ -107,7 +107,7 @@ export default function EventCard({ event }: EventCardProps) {
           {/* View Event Button */}
           <Link
             href={`/events/${event._id}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white hover:border-emerald-600 transition-all duration-200 shadow-sm"
+            className="btn-magnetic inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 dark:hover:text-white hover:border-emerald-600 shadow-xs"
           >
             <span>View Event</span>
             <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
