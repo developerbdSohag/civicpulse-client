@@ -20,7 +20,9 @@ import {
   Loader2,
   Sparkles,
   CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
+import SafeImage from '@/components/common/SafeImage';
 import { toast } from 'sonner';
 
 const EVENT_TYPES = [
@@ -71,6 +73,7 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState('');
   const [eventType, setEventType] = useState('Donation');
   const [thumbnail, setThumbnail] = useState(PRESET_THUMBNAILS[0].url);
+  const [imageStatus, setImageStatus] = useState<'loading' | 'success' | 'error'>('success');
   const [location, setLocation] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [targetVolunteers, setTargetVolunteers] = useState('50');
@@ -269,19 +272,57 @@ export default function CreateEventPage() {
 
             {/* Thumbnail URL with Preset Selection */}
             <div className="space-y-3">
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                <ImageIcon className="w-4 h-4 text-emerald-600" />
-                Thumbnail Image URL *
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-emerald-600" />
+                  Thumbnail Image URL *
+                </span>
+                <span className="text-[11px] text-gray-400 font-normal">
+                  Direct image link (.jpg, .png, .webp, or Unsplash)
+                </span>
               </label>
               
               <input
                 type="url"
                 value={thumbnail}
-                onChange={(e) => setThumbnail(e.target.value)}
+                onChange={(e) => {
+                  setThumbnail(e.target.value);
+                  setImageStatus('loading');
+                }}
                 placeholder="https://images.unsplash.com/..."
                 required
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               />
+
+              {/* Status Indicator */}
+              {imageStatus === 'error' && (
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold">Notice: The URL entered is not a direct image file or blocks external embedding.</p>
+                    <p className="text-[11px] text-amber-700 dark:text-amber-400/90 leading-relaxed">
+                      Tip: If copying from photo websites (like Freepik, Magnific, or Unsplash), right-click the photo itself and choose <strong>&ldquo;Copy Image Address&rdquo;</strong> (so the link ends in .jpg, .png, or .webp), rather than copying the browser address bar.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setThumbnail(PRESET_THUMBNAILS[0].url);
+                        setImageStatus('success');
+                      }}
+                      className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400 hover:underline pt-0.5 cursor-pointer"
+                    >
+                      Use verified high-resolution photo preset &rarr;
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {imageStatus === 'success' && thumbnail && (
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  <span>Image verified &amp; loaded smoothly.</span>
+                </p>
+              )}
 
               {/* Preset Thumbnails Picker */}
               <div>
@@ -293,19 +334,21 @@ export default function CreateEventPage() {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setThumbnail(preset.url)}
-                      className={`relative h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                      onClick={() => {
+                        setThumbnail(preset.url);
+                        setImageStatus('success');
+                      }}
+                      className={`relative h-14 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
                         thumbnail === preset.url
-                          ? 'border-emerald-500 scale-95 shadow-md'
-                          : 'border-transparent opacity-70 hover:opacity-100'
+                          ? 'border-emerald-500 scale-95 shadow-md ring-2 ring-emerald-400/30'
+                          : 'border-transparent opacity-70 hover:opacity-100 hover:border-gray-300 dark:hover:border-gray-700'
                       }`}
                     >
-                      <Image
+                      <SafeImage
                         src={preset.url}
                         alt={preset.name}
                         fill
                         className="object-cover"
-                        sizes="100px"
                       />
                       <span className="absolute inset-x-0 bottom-0 bg-black/60 text-[9px] text-white text-center py-0.5 truncate">
                         {preset.name}
@@ -315,18 +358,34 @@ export default function CreateEventPage() {
                 </div>
               </div>
 
-              {/* Image Preview */}
+              {/* Live Preview Card */}
               {thumbnail && (
-                <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100" style={{ position: 'relative', width: '100%', height: '11rem' }}>
-                  <Image
+                <div className="relative h-48 sm:h-56 w-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 shadow-sm" style={{ position: 'relative', width: '100%', height: '14rem' }}>
+                  <SafeImage
                     src={thumbnail}
-                    alt="Event preview"
+                    fallbackSrc={PRESET_THUMBNAILS[0].url}
+                    alt={title || 'Event preview'}
                     fill
-                    className="object-cover"
-                    onError={() => {}}
+                    onStatusChange={setImageStatus}
                   />
-                  <div className="absolute top-2 right-2 px-2.5 py-1 rounded-md bg-black/70 text-white text-[11px] font-medium">
-                    Live Preview
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
+
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-sm text-white text-[11px] font-medium flex items-center gap-1.5 shadow-sm">
+                    <span className={`w-2 h-2 rounded-full ${imageStatus === 'error' ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}`} />
+                    {imageStatus === 'error' ? 'Showing Verified Fallback' : 'Live Preview'}
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none space-y-0.5">
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 text-white backdrop-blur-xs">
+                      {eventType}
+                    </span>
+                    <p className="text-sm sm:text-base font-bold truncate drop-shadow">
+                      {title || 'Your Event Title Will Appear Here'}
+                    </p>
+                    <p className="text-xs text-gray-200 truncate drop-shadow flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-emerald-400" />
+                      {location || 'Location details'}
+                    </p>
                   </div>
                 </div>
               )}

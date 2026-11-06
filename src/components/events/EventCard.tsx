@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import Link from 'next/link';
 import { EventItem } from '@/types';
 import { Calendar, MapPin, Users, ArrowRight, Tag } from 'lucide-react';
@@ -37,12 +38,11 @@ export default function EventCard({ event }: EventCardProps) {
       
       {/* Thumbnail Section */}
       <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-        <Image
+        <SafeImage
           src={event.thumbnail}
           alt={event.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
 

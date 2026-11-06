@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -331,12 +332,11 @@ export default function EventDetailsClient({ id }: { id: string }) {
 
       {/* Hero Banner Image */}
       <div className="relative w-full h-72 sm:h-96 lg:h-[450px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800" style={{ position: 'relative', width: '100%', minHeight: '18rem', maxHeight: '450px' }}>
-        <Image
+        <SafeImage
           src={event.thumbnail}
           alt={event.title}
           fill
           className="object-cover"
-          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-black/30 to-transparent" />
 

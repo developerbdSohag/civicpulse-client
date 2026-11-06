@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import SafeImage from '@/components/common/SafeImage';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { EventItem } from '@/types';
@@ -243,7 +244,7 @@ export default function ManageEventsPage() {
                       {/* Title & Thumbnail */}
                       <td className="py-4 px-4 sm:px-6">
                         <div className="flex items-center gap-3">
-                          <Image
+                          <SafeImage
                             src={evt.thumbnail}
                             alt={evt.title}
                             width={48}
@@ -424,6 +425,19 @@ export default function ManageEventsPage() {
                     required
                     className="w-full px-3.5 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
+                  {editForm.thumbnail && (
+                    <div className="mt-2 relative h-32 w-full rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800">
+                      <SafeImage
+                        src={editForm.thumbnail}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px]">
+                        Preview
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
