@@ -4,7 +4,7 @@ import { findUserByEmail, createUser, signToken } from '@/server/store';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, photoURL } = body;
+    const { name, email, password, photoURL, phone, location, bio } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const newUser = createUser({ name, email, password, photoURL });
+    const newUser = createUser({ name, email, password, photoURL, phone, location, bio });
     const token = signToken(newUser);
 
     const safeUser = {

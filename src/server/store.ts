@@ -277,7 +277,15 @@ export function findUserById(id: string): StoredUser | null {
   return store.users.get(id) || null;
 }
 
-export function createUser(data: { name: string; email: string; password?: string; photoURL?: string }): StoredUser {
+export function createUser(data: {
+  name: string;
+  email: string;
+  password?: string;
+  photoURL?: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+}): StoredUser {
   initStore();
   const store = getStore();
   const id = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
@@ -288,9 +296,9 @@ export function createUser(data: { name: string; email: string; password?: strin
     email: data.email.trim().toLowerCase(),
     password: data.password ? bcrypt.hashSync(data.password, 10) : undefined,
     photoURL: data.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name)}`,
-    bio: '',
-    phone: '',
-    location: '',
+    bio: data.bio || '',
+    phone: data.phone || '',
+    location: data.location || '',
     createdAt: new Date().toISOString(),
   };
   store.users.set(id, newUser);

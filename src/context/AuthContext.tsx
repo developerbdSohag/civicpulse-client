@@ -9,7 +9,15 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<{ success: boolean; message?: string }>;
-  register: (name: string, email: string, pass: string, photoURL?: string) => Promise<{ success: boolean; message?: string }>;
+  register: (
+    name: string,
+    email: string,
+    pass: string,
+    photoURL?: string,
+    phone?: string,
+    location?: string,
+    bio?: string
+  ) => Promise<{ success: boolean; message?: string }>;
   googleLogin: (email: string, name?: string, photoURL?: string) => Promise<{ success: boolean; message?: string; user?: User }>;
   logout: () => void;
   updateUser: (updatedFields: Partial<User>) => void;
@@ -79,9 +87,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, pass: string, photoURL?: string) => {
+  const register = async (
+    name: string,
+    email: string,
+    pass: string,
+    photoURL?: string,
+    phone?: string,
+    location?: string,
+    bio?: string
+  ) => {
     try {
-      const res = await authAPI.register({ name, email, password: pass, photoURL });
+      const res = await authAPI.register({
+        name,
+        email,
+        password: pass,
+        photoURL,
+        phone,
+        location,
+        bio,
+      });
       if (res.success && res.token && res.user) {
         handleAuthSuccess(res.user, res.token);
         return { success: true, message: res.message };

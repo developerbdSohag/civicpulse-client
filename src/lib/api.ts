@@ -51,7 +51,15 @@ async function apiRequest<T = any>(
 }
 
 export const authAPI = {
-  register: (payload: { name: string; email: string; password: string; photoURL?: string }) =>
+  register: (payload: {
+    name: string;
+    email: string;
+    password: string;
+    photoURL?: string;
+    phone?: string;
+    location?: string;
+    bio?: string;
+  }) =>
     apiRequest<{ success: boolean; message: string; user: User; token: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload),
