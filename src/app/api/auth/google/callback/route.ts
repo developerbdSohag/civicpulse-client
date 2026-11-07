@@ -42,15 +42,35 @@ export async function GET(req: Request) {
       });
 
       const tokenData = await tokenRes.json();
-      if (tokenData.access_token) {
-        // Fetch verified user profile from Google UserInfo
-        const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenData.access_token}` },
-        });
-        const profile = await profileRes.json();
-        email = profile.email;
-        name = profile.name || profile.given_name;
-        photoURL = profile.picture;
+      console.log('Google token response received:', tokenData ? 'success' : 'empty');
+
+      // Decode Google ID Token payload if present
+      if (tokenData.id_token) {
+        try {
+          const base64Payload = tokenData.id_token.split('.')[1];
+          const decodedJson = Buffer.from(base64Payload, 'base64').toString('utf8');
+          const idPayload = JSON.parse(decodedJson);
+          if (idPayload.email) email = idPayload.email;
+          if (idPayload.name) name = idPayload.name;
+          if (idPayload.picture) photoURL = idPayload.picture;
+        } catch (e) {
+          console.error('Error decoding Google ID token:', e);
+        }
+      }
+
+      // Also query Google UserInfo if access_token is present
+      if (tokenData.access_token && (!email || !name)) {
+        try {
+          const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
+          });
+          const profile = await profileRes.json();
+          if (profile.email) email = profile.email;
+          if (profile.name) name = profile.name;
+          if (profile.picture) photoURL = profile.picture;
+        } catch (e) {
+          console.error('Error fetching Google userinfo:', e);
+        }
       }
     }
 
