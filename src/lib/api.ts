@@ -63,7 +63,7 @@ export const authAPI = {
       body: JSON.stringify(payload),
     }),
 
-  googleAuth: (payload: { email: string }) =>
+  googleAuth: (payload: { email: string; name?: string; photoURL?: string }) =>
     apiRequest<{ success: boolean; message: string; user: User; token: string }>('/auth/google', {
       method: 'POST',
       body: JSON.stringify(payload),

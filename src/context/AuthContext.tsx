@@ -10,7 +10,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, pass: string) => Promise<{ success: boolean; message?: string }>;
   register: (name: string, email: string, pass: string, photoURL?: string) => Promise<{ success: boolean; message?: string }>;
-  googleLogin: (email: string) => Promise<{ success: boolean; message?: string; notRegistered?: boolean; email?: string }>;
+  googleLogin: (email: string, name?: string, photoURL?: string) => Promise<{ success: boolean; message?: string; user?: User }>;
   logout: () => void;
   updateUser: (updatedFields: Partial<User>) => void;
   refreshUser: () => Promise<void>;
@@ -92,20 +92,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const googleLogin = async (email: string) => {
+  const googleLogin = async (email: string, name?: string, photoURL?: string) => {
     try {
-      const res = await authAPI.googleAuth({ email });
+      const res = await authAPI.googleAuth({ email, name, photoURL });
       if (res.success && res.token && res.user) {
         handleAuthSuccess(res.user, res.token);
         return { success: true, message: res.message, user: res.user };
       }
-      return { success: false, message: res.message || 'Google login failed', notRegistered: false };
+      return { success: false, message: res.message || 'Google login failed' };
     } catch (err: any) {
       return {
         success: false,
         message: err.message || 'Google login failed',
-        notRegistered: err.notRegistered || err.data?.notRegistered || false,
-        email: email,
       };
     }
   };

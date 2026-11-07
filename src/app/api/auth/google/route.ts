@@ -1,29 +1,35 @@
 import { NextResponse } from 'next/server';
-import { findUserByEmail, signToken } from '@/server/store';
+import { findUserByEmail, createUser, signToken } from '@/server/store';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email } = body;
+    const { email, name, photoURL } = body;
 
-    if (!email) {
+    if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { success: false, message: 'Google account email is required.' },
         { status: 400 }
       );
     }
 
-    const user = findUserByEmail(email);
+    const normalizedEmail = email.trim().toLowerCase();
+    let user = findUserByEmail(normalizedEmail);
+    let isNewUser = false;
 
+    // Direct Google Sign-In & Sign-Up: No verification needed!
+    // If account is new, create it automatically and log in immediately.
     if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          notRegistered: true,
-          message: `The Google account (${email}) is not registered yet. Please create an account with this email first.`,
-        },
-        { status: 404 }
-      );
+      const displayName = name || normalizedEmail.split('@')[0];
+      user = createUser({
+        name: displayName,
+        email: normalizedEmail,
+        password: 'GoogleOAuthUser@CivicPulse2026',
+        photoURL: photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}`,
+      });
+      isNewUser = true;
+    } else if (name && (!user.name || user.name.includes('@'))) {
+      user.name = name;
     }
 
     const token = signToken(user);
@@ -39,7 +45,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Google Sign-in successful! Welcome back, ${user.name}.`,
+      isNewUser,
+      message: isNewUser
+        ? `Welcome to CivicPulse, ${user.name}! Your account is ready.`
+        : `Google Sign-in successful! Welcome back, ${user.name}.`,
       user: safeUser,
       token,
     });

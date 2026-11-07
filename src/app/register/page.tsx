@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { authAPI } from '@/lib/api';
 import {
   HeartHandshake,
   User,
@@ -19,10 +18,11 @@ import {
   Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import GoogleAccountChooserModal from '@/components/auth/GoogleAccountChooserModal';
-import EmailVerificationModal from '@/components/auth/EmailVerificationModal';
 
 function RegisterContent() {
+  const { register } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -35,11 +35,7 @@ function RegisterContent() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Verification modal state
-  const [verifyModalOpen, setVerifyModalOpen] = useState(false);
-  const [dispatchedCode, setDispatchedCode] = useState<string | undefined>(undefined);
-
-  // Google Account Chooser modal
+  // Google Account Chooser modal (Direct, no verification needed)
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   useEffect(() => {
@@ -82,27 +78,28 @@ function RegisterContent() {
     setLoading(true);
 
     try {
-      // Dispatch 6-digit verification code to the email
-      const res = await authAPI.sendVerificationCode({
-        email: email.trim(),
-        name: name.trim(),
-        photoURL: photoURL.trim() || undefined,
-      });
+      const result = await register(
+        name.trim(),
+        email.trim(),
+        password,
+        photoURL.trim() || undefined
+      );
 
-      if (res.success) {
-        toast.info(`A 6-digit verification code was sent to ${email.trim()}.`);
-        setDispatchedCode(res.code);
-        setVerifyModalOpen(true);
+      if (result.success) {
+        try {
+          confetti({
+            particleCount: 90,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        } catch (_) {}
+        toast.success(result.message || 'Account created successfully! Welcome to CivicPulse.');
+        router.push('/events');
       } else {
-        if (res.isRegistered) {
-          toast.error(res.message);
-          router.push('/login');
-        } else {
-          toast.error(res.message || 'Failed to dispatch verification code.');
-        }
+        toast.error(result.message || 'Registration failed. Please try again.');
       }
     } catch (err: any) {
-      toast.error(err.message || 'Registration check failed. Please try again.');
+      toast.error(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -125,12 +122,12 @@ function RegisterContent() {
           </p>
         </div>
 
-        {/* Pre-filled Notice if redirected from Google login */}
+        {/* Pre-filled Notice if redirected */}
         {queryEmail && (
           <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <span>
-              Setting up your account for <strong>{queryEmail}</strong>. Please choose your name and password to complete registration.
+              Setting up your account for <strong>{queryEmail}</strong>. Please complete the form below.
             </span>
           </div>
         )}
@@ -250,7 +247,7 @@ function RegisterContent() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Sending Verification Code...</span>
+                <span>Creating Account...</span>
               </>
             ) : (
               <>
@@ -270,7 +267,7 @@ function RegisterContent() {
           <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
         </div>
 
-        {/* Google 1-Click Button */}
+        {/* Google 1-Click Button (Direct, No Verification Needed) */}
         <button
           type="button"
           onClick={() => setGoogleModalOpen(true)}
@@ -310,18 +307,7 @@ function RegisterContent() {
         </p>
       </div>
 
-      {/* EMAIL VERIFICATION BOX MODAL */}
-      <EmailVerificationModal
-        isOpen={verifyModalOpen}
-        onClose={() => setVerifyModalOpen(false)}
-        email={email.trim()}
-        name={name.trim()}
-        photoURL={photoURL.trim() || undefined}
-        initialCode={dispatchedCode}
-        onSuccessRedirect="/events"
-      />
-
-      {/* GOOGLE ACCOUNT CHOOSER MODAL */}
+      {/* GOOGLE ACCOUNT CHOOSER MODAL (1-Click, No verification needed) */}
       <GoogleAccountChooserModal
         isOpen={googleModalOpen}
         onClose={() => setGoogleModalOpen(false)}
