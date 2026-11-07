@@ -90,6 +90,13 @@ export async function GET(req: Request) {
         password: 'GoogleOAuthUser@CivicPulse2026',
         photoURL: photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || normalizedEmail)}`,
       });
+    } else {
+      if (name && (user.name === 'Google User' || !user.name || user.name.includes('@'))) {
+        user.name = name;
+      }
+      if (photoURL && (!user.photoURL || user.photoURL.includes('dicebear'))) {
+        user.photoURL = photoURL;
+      }
     }
 
     const token = signToken(user);

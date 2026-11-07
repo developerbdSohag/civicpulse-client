@@ -617,11 +617,22 @@ export function signToken(user: StoredUser): string {
 
 export function verifyAuthToken(req: Request): { id: string; email: string; name: string } | null {
   try {
+    let token = '';
     const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else {
+      const cookieHeader = req.headers.get('cookie') || '';
+      const match = cookieHeader.match(/(?:civicpulse_token|token)=([^;]+)/);
+      if (match) {
+        token = decodeURIComponent(match[1]);
+      }
+    }
+
+    if (!token) {
       return null;
     }
-    const token = authHeader.split(' ')[1];
+
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     return decoded;
   } catch (err) {
