@@ -18,7 +18,7 @@ export async function GET(req: Request) {
   const clientId =
     process.env.GOOGLE_CLIENT_ID ||
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-    '720853280071-aafuf58ki4o8af4eh8n5ki20uqiffj3a.apps.googleusercontent.com';
+    '642943369890-s15vb7p1el6ofkalrr52e9cm9d70cm2c.apps.googleusercontent.com';
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
   const redirectUri = `${origin}/api/auth/google/callback`;
 
