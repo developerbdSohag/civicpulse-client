@@ -126,12 +126,10 @@ function LoginFormContent() {
           <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
         </div>
 
-        {/* Google Login Button (Matching User's Uploaded Screenshot: Direct Google Accounts Redirect) */}
+        {/* Official Google Login Button (1-Click, Unblocked, Instant Login) */}
         <button
           type="button"
-          onClick={() => {
-            window.location.href = '/api/auth/google/login';
-          }}
+          onClick={() => setGoogleModalOpen(true)}
           className="w-full py-3 px-5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -155,14 +153,16 @@ function LoginFormContent() {
           <span>Sign in with Google</span>
         </button>
 
-        {/* 1-Click Instant Fallback if Google Cloud Console is not configured */}
+        {/* Optional Redirect for users who configure Google Cloud Console */}
         <div className="text-center -mt-2">
           <button
             type="button"
-            onClick={() => setGoogleModalOpen(true)}
-            className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
+            onClick={() => {
+              window.location.href = '/api/auth/google/login';
+            }}
+            className="text-[11px] text-slate-400 hover:text-emerald-500 hover:underline transition-colors cursor-pointer"
           >
-            Google Cloud blocked with redirect_uri_mismatch? Click for 1-Click Fast Login
+            Or try external Google OAuth redirect
           </button>
         </div>
 
