@@ -11,11 +11,9 @@ import {
   ShieldCheck,
   Users,
   Sparkles,
-  Lock,
   ArrowRight,
   Loader2,
   Check,
-  AlertCircle,
   MapPin,
   Heart,
   ChevronDown,
@@ -170,20 +168,20 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b12] text-slate-100 py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070b12] text-slate-900 dark:text-slate-100 py-6 sm:py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-250">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Top Breadcrumb (Matching Image 1) */}
-        <nav className="flex items-center gap-2 text-xs font-medium text-slate-400">
+        <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
           <Link
             href="/"
-            className="flex items-center gap-1.5 hover:text-emerald-400 transition-colors"
+            className="flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             <Home className="w-3.5 h-3.5" />
             <span>Home</span>
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-          <span className="text-slate-200 font-semibold">Sign up</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
+          <span className="text-slate-800 dark:text-slate-200 font-semibold">Sign up</span>
         </nav>
 
         {/* 2-Column Split Hero Registration Container (Matching Image 1) */}
@@ -193,7 +191,7 @@ function RegisterContent() {
               LEFT COLUMN: Vibrant Emerald Grid Card (built for Bangladesh)
              ============================================================= */}
           <div
-            className="lg:col-span-5 rounded-3xl p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden shadow-2xl border border-emerald-400/30 text-white"
+            className="lg:col-span-5 rounded-3xl p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden shadow-2xl shadow-emerald-950/15 border border-emerald-400/30 text-white"
             style={{
               background: 'linear-gradient(145deg, #10b981 0%, #059669 55%, #047857 100%)',
               backgroundImage: `
@@ -290,23 +288,23 @@ function RegisterContent() {
           </div>
 
           {/* =============================================================
-              RIGHT COLUMN: Dark Workspace Setup Form Card (Matching Image 1)
+              RIGHT COLUMN: Professional Theme-Adaptive Form Card
              ============================================================= */}
-          <div className="lg:col-span-7 rounded-3xl bg-[#0f1722] border border-slate-800 p-8 sm:p-10 flex flex-col justify-between shadow-2xl space-y-6">
+          <div className="lg:col-span-7 rounded-3xl bg-white dark:bg-[#0f1722] border border-slate-200/90 dark:border-slate-800 p-8 sm:p-10 flex flex-col justify-between shadow-xl shadow-slate-200/50 dark:shadow-2xl transition-colors duration-250 space-y-6">
             
             <div className="space-y-6">
               {/* Badge: Free Community Access */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-400 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>100% Free Volunteer Account</span>
               </div>
 
               {/* Title & Subtitle (Matching Image 1) */}
               <div className="space-y-1.5">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   {step === 1 ? 'Create your profile' : 'Interests & community setup'}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                   {step === 1
                     ? 'Tell us about yourself. Once registered, we’ll set up your CivicPulse account and give you full access to upcoming drives.'
                     : 'Choose your district and primary volunteer initiatives so we can show relevant drives near you.'}
@@ -319,29 +317,51 @@ function RegisterContent() {
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      step >= 1 ? 'bg-emerald-500 text-black' : 'bg-slate-800 text-slate-400'
+                      step >= 1
+                        ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-black'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     1
                   </div>
-                  <span className={`text-xs font-semibold ${step === 1 ? 'text-white' : 'text-slate-400'}`}>
+                  <span
+                    className={`text-xs font-semibold ${
+                      step === 1
+                        ? 'text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
                     Your details
                   </span>
                 </div>
 
                 {/* Connecting Line */}
-                <div className={`flex-1 h-0.5 ${step === 2 ? 'bg-emerald-500' : 'bg-slate-800'} transition-colors`} />
+                <div
+                  className={`flex-1 h-0.5 ${
+                    step === 2
+                      ? 'bg-emerald-600 dark:bg-emerald-500'
+                      : 'bg-slate-200 dark:bg-slate-800'
+                  } transition-colors`}
+                />
 
                 {/* Step 2 Pill */}
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      step === 2 ? 'bg-emerald-500 text-black' : 'bg-slate-800 text-slate-400'
+                      step === 2
+                        ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-black'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     2
                   </div>
-                  <span className={`text-xs font-semibold ${step === 2 ? 'text-white' : 'text-slate-400'}`}>
+                  <span
+                    className={`text-xs font-semibold ${
+                      step === 2
+                        ? 'text-slate-900 dark:text-white font-bold'
+                        : 'text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
                     Community setup
                   </span>
                 </div>
@@ -355,7 +375,7 @@ function RegisterContent() {
                   {/* Row 1: Your Name & Your Designation */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                         Your name *
                       </label>
                       <input
@@ -364,12 +384,12 @@ function RegisterContent() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Rahim Uddin"
                         required
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                         Your designation *
                       </label>
                       <input
@@ -378,7 +398,7 @@ function RegisterContent() {
                         onChange={(e) => setDesignation(e.target.value)}
                         placeholder="e.g. Volunteer Lead, Coordinator"
                         required
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-xs"
                       />
                     </div>
                   </div>
@@ -386,7 +406,7 @@ function RegisterContent() {
                   {/* Row 2: Work Email & Phone Number with BD +880 (Matching Image 1) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                         Work / Personal email *
                       </label>
                       <input
@@ -395,16 +415,16 @@ function RegisterContent() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@company.com"
                         required
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-xs"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                         Phone
                       </label>
-                      <div className="flex rounded-xl border border-slate-700 bg-slate-900/90 overflow-hidden focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500">
-                        <span className="px-3 py-2.5 bg-slate-800 text-slate-300 text-xs font-medium border-r border-slate-700 flex items-center gap-1 select-none shrink-0">
+                      <div className="flex rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 shadow-xs">
+                        <span className="px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold border-r border-slate-300 dark:border-slate-700 flex items-center gap-1 select-none shrink-0">
                           BD +880
                         </span>
                         <input
@@ -412,7 +432,7 @@ function RegisterContent() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="1XXXXXXXXX"
-                          className="w-full px-3 py-2.5 bg-transparent text-white placeholder:text-slate-500 text-sm focus:outline-none"
+                          className="w-full px-3 py-2.5 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none"
                         />
                       </div>
                     </div>
@@ -420,7 +440,7 @@ function RegisterContent() {
 
                   {/* Row 3: Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                       Account Password *
                     </label>
                     <div className="relative">
@@ -430,32 +450,32 @@ function RegisterContent() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all shadow-xs"
                       />
                     </div>
 
                     {/* Password criteria chips */}
                     <div className="flex flex-wrap items-center gap-3 pt-2 text-[11px]">
-                      <span className={`flex items-center gap-1 ${hasMinLength ? 'text-emerald-400 font-semibold' : 'text-slate-500'}`}>
-                        {hasMinLength ? <Check className="w-3 h-3 text-emerald-400" /> : '•'} 6+ characters
+                      <span className={`flex items-center gap-1 ${hasMinLength ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+                        {hasMinLength ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : '•'} 6+ characters
                       </span>
-                      <span className={`flex items-center gap-1 ${hasUpperCase ? 'text-emerald-400 font-semibold' : 'text-slate-500'}`}>
-                        {hasUpperCase ? <Check className="w-3 h-3 text-emerald-400" /> : '•'} 1 Uppercase (A-Z)
+                      <span className={`flex items-center gap-1 ${hasUpperCase ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+                        {hasUpperCase ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : '•'} 1 Uppercase (A-Z)
                       </span>
-                      <span className={`flex items-center gap-1 ${hasLowerCase ? 'text-emerald-400 font-semibold' : 'text-slate-500'}`}>
-                        {hasLowerCase ? <Check className="w-3 h-3 text-emerald-400" /> : '•'} 1 Lowercase (a-z)
+                      <span className={`flex items-center gap-1 ${hasLowerCase ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+                        {hasLowerCase ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : '•'} 1 Lowercase (a-z)
                       </span>
                     </div>
                   </div>
 
                   {/* Google 1-Click Option Section (Matching Image 1's auxiliary action box) */}
-                  <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
                     <div className="space-y-0.5 text-center sm:text-left">
-                      <p className="text-xs font-bold text-white flex items-center gap-1.5 justify-center sm:justify-start">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                      <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 justify-center sm:justify-start">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span>Or 1-Click with Google</span>
                       </p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         Choose your Google account. No verification needed!
                       </p>
                     </div>
@@ -505,15 +525,15 @@ function RegisterContent() {
                 <form onSubmit={handleFinalSubmit} className="space-y-5 pt-2 animate-in fade-in">
                   {/* Select District / Area */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>Primary District / Area in Bangladesh *</span>
                     </label>
                     <div className="relative">
                       <select
                         value={district}
                         onChange={(e) => setDistrict(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white text-sm focus:outline-none focus:border-emerald-500 appearance-none cursor-pointer"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-emerald-500 appearance-none cursor-pointer shadow-xs"
                       >
                         {BD_DISTRICTS.map((dist) => (
                           <option key={dist} value={dist}>
@@ -527,22 +547,22 @@ function RegisterContent() {
 
                   {/* Optional Profile Photo URL */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                      Profile Avatar URL <span className="text-slate-500 font-normal">(Optional)</span>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Profile Avatar URL <span className="text-slate-400 dark:text-slate-500 font-normal">(Optional)</span>
                     </label>
                     <input
                       type="url"
                       value={photoURL}
                       onChange={(e) => setPhotoURL(e.target.value)}
                       placeholder="https://images.unsplash.com/... (optional)"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/90 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 shadow-xs"
                     />
                   </div>
 
                   {/* Causes you want to volunteer for */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
-                      <Heart className="w-3.5 h-3.5 text-emerald-400" />
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+                      <Heart className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>Select Social Causes You Care About</span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -555,15 +575,15 @@ function RegisterContent() {
                             onClick={() => toggleCause(cause)}
                             className={`p-2.5 rounded-xl text-xs font-medium text-left flex items-center gap-2 border transition-all cursor-pointer ${
                               isChecked
-                                ? 'bg-emerald-950/60 border-emerald-500 text-emerald-200 shadow-sm'
-                                : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-700'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 shadow-sm'
+                                : 'bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                             }`}
                           >
                             <div
                               className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] shrink-0 border ${
                                 isChecked
                                   ? 'bg-emerald-500 border-emerald-500 text-black font-bold'
-                                  : 'border-slate-700 bg-slate-800'
+                                  : 'border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800'
                               }`}
                             >
                               {isChecked && '✓'}
@@ -580,7 +600,7 @@ function RegisterContent() {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="px-5 py-3.5 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                      className="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
                     >
                       ← Back
                     </button>
@@ -607,11 +627,11 @@ function RegisterContent() {
             </div>
 
             {/* Bottom Footer: Already have an account? Sign in (Matching Image 1) */}
-            <div className="pt-6 border-t border-slate-800/80 text-center text-xs text-slate-400">
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800/80 text-center text-xs text-slate-600 dark:text-slate-400">
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="font-bold text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
+                className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors"
               >
                 Sign in
               </Link>
@@ -634,8 +654,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#070b12] flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070b12] flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
         </div>
       }
     >
