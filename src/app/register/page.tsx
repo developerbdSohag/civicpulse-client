@@ -497,6 +497,17 @@ function RegisterContent() {
                       </svg>
                       <span>Sign in with Google</span>
                     </button>
+
+                    {/* 1-Click Instant Fallback if Google Cloud Console is not configured */}
+                    <div className="text-center pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setGoogleModalOpen(true)}
+                        className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
+                      >
+                        Google Cloud blocked with redirect_uri_mismatch? Click for 1-Click Fast Sign Up
+                      </button>
+                    </div>
                   </div>
 
                   {/* Primary Next Button (Matching Image 1: Green button "Next: Company details ->") */}

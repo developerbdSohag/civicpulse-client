@@ -155,6 +155,17 @@ function LoginFormContent() {
           <span>Sign in with Google</span>
         </button>
 
+        {/* 1-Click Instant Fallback if Google Cloud Console is not configured */}
+        <div className="text-center -mt-2">
+          <button
+            type="button"
+            onClick={() => setGoogleModalOpen(true)}
+            className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
+          >
+            Google Cloud blocked with redirect_uri_mismatch? Click for 1-Click Fast Login
+          </button>
+        </div>
+
         {/* Redirect to Register Page */}
         <p className="text-center text-xs text-gray-600 dark:text-gray-400">
           Don&apos;t have an account yet?{' '}
