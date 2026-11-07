@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
-import GoogleAccountChooserModal from '@/components/auth/GoogleAccountChooserModal';
 
 const BD_DISTRICTS = [
   'Dhaka (Mirpur, Mohammadpur, Dhanmondi)',
@@ -68,7 +67,6 @@ function RegisterContent() {
   const [selectedCauses, setSelectedCauses] = useState<string[]>([CAUSES[0], CAUSES[1]]);
 
   const [loading, setLoading] = useState(false);
-  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   useEffect(() => {
     if (queryEmail) setEmail(queryEmail);
@@ -469,10 +467,13 @@ function RegisterContent() {
                   </div>
 
                   {/* Official Google Register Button (1-Click, Unblocked, Instant Onboarding) */}
+                  {/* Official Google Register Button (Direct Google OAuth 2.0) */}
                   <div className="pt-1">
                     <button
                       type="button"
-                      onClick={() => setGoogleModalOpen(true)}
+                      onClick={() => {
+                        window.location.href = '/api/auth/google/login';
+                      }}
                       className="w-full py-3 px-5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer"
                     >
                       <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -495,19 +496,6 @@ function RegisterContent() {
                       </svg>
                       <span>Sign in with Google</span>
                     </button>
-
-                    {/* Optional external OAuth redirect */}
-                    <div className="text-center pt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.location.href = '/api/auth/google/login';
-                        }}
-                        className="text-[11px] text-slate-400 hover:text-emerald-500 hover:underline transition-colors cursor-pointer"
-                      >
-                        Or try external Google OAuth redirect
-                      </button>
-                    </div>
                   </div>
 
                   {/* Primary Next Button (Matching Image 1: Green button "Next: Company details ->") */}
@@ -643,12 +631,6 @@ function RegisterContent() {
         </div>
       </div>
 
-      {/* Google Account Chooser Modal (1-Click, No verification needed) */}
-      <GoogleAccountChooserModal
-        isOpen={googleModalOpen}
-        onClose={() => setGoogleModalOpen(false)}
-        onSuccessRedirect="/events"
-      />
     </div>
   );
 }

@@ -13,7 +13,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import GoogleAccountChooserModal from '@/components/auth/GoogleAccountChooserModal';
 
 function LoginFormContent() {
   const { login } = useAuth();
@@ -24,9 +23,6 @@ function LoginFormContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Google Sign-In Account Chooser Modal (matching Image 2)
-  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,10 +122,12 @@ function LoginFormContent() {
           <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
         </div>
 
-        {/* Official Google Login Button (1-Click, Unblocked, Instant Login) */}
+        {/* Official Google Sign-In Button (Direct Google OAuth 2.0) */}
         <button
           type="button"
-          onClick={() => setGoogleModalOpen(true)}
+          onClick={() => {
+            window.location.href = '/api/auth/google/login';
+          }}
           className="w-full py-3 px-5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -153,19 +151,6 @@ function LoginFormContent() {
           <span>Sign in with Google</span>
         </button>
 
-        {/* Optional Redirect for users who configure Google Cloud Console */}
-        <div className="text-center -mt-2">
-          <button
-            type="button"
-            onClick={() => {
-              window.location.href = '/api/auth/google/login';
-            }}
-            className="text-[11px] text-slate-400 hover:text-emerald-500 hover:underline transition-colors cursor-pointer"
-          >
-            Or try external Google OAuth redirect
-          </button>
-        </div>
-
         {/* Redirect to Register Page */}
         <p className="text-center text-xs text-gray-600 dark:text-gray-400">
           Don&apos;t have an account yet?{' '}
@@ -178,13 +163,6 @@ function LoginFormContent() {
           </Link>
         </p>
       </div>
-
-      {/* GOOGLE ACCOUNT CHOOSER MODAL (Exact design from Image 2) */}
-      <GoogleAccountChooserModal
-        isOpen={googleModalOpen}
-        onClose={() => setGoogleModalOpen(false)}
-        onSuccessRedirect={redirectUrl}
-      />
     </div>
   );
 }
