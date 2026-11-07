@@ -32,18 +32,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Restore session from localStorage immediately on mount
+  // Restore session from localStorage or OAuth callback immediately on mount
   useEffect(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get('token');
+        if (urlToken) {
+          localStorage.setItem('civicpulse_token', urlToken);
+          urlParams.delete('token');
+          const newSearch = urlParams.toString();
+          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash;
+          window.history.replaceState({}, document.title, newUrl);
+        }
+      }
+
       const storedToken = localStorage.getItem('civicpulse_token');
       const storedUser = localStorage.getItem('civicpulse_user');
 
-      if (storedToken && storedUser) {
+      if (storedToken) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        if (storedUser) {
+          try {
+            setUser(JSON.parse(storedUser));
+          } catch (_) {}
+        }
 
         // Background verification to keep session sync
-        authAPI.getMe()
+        authAPI
+          .getMe()
           .then((res) => {
             if (res.success && res.user) {
               setUser(res.user);
@@ -51,7 +68,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           })
           .catch(() => {
-            // If token expired, clear
             logout();
           })
           .finally(() => {

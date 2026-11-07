@@ -126,13 +126,15 @@ function LoginFormContent() {
           <div className="border-t border-gray-200 dark:border-gray-800 w-full" />
         </div>
 
-        {/* Google Login Button (Takes user directly to Image 2 interface) */}
+        {/* Google Login Button (Matching User's Uploaded Screenshot: Direct Google Accounts Redirect) */}
         <button
           type="button"
-          onClick={() => setGoogleModalOpen(true)}
-          className="w-full btn-magnetic btn-steel-secondary py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+          onClick={() => {
+            window.location.href = '/api/auth/google/login';
+          }}
+          className="w-full py-3 px-5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

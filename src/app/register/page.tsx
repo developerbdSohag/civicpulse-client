@@ -468,24 +468,16 @@ function RegisterContent() {
                     </div>
                   </div>
 
-                  {/* Google 1-Click Option Section (Matching Image 1's auxiliary action box) */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-                    <div className="space-y-0.5 text-center sm:text-left">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 justify-center sm:justify-start">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span>Or 1-Click with Google</span>
-                      </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Choose your Google account. No verification needed!
-                      </p>
-                    </div>
-
+                  {/* Google 1-Click Option (Matching User's Uploaded Screenshot: Direct Google Accounts Redirect) */}
+                  <div className="pt-1">
                     <button
                       type="button"
-                      onClick={() => setGoogleModalOpen(true)}
-                      className="btn-magnetic btn-steel-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shrink-0 cursor-pointer"
+                      onClick={() => {
+                        window.location.href = '/api/auth/google/login';
+                      }}
+                      className="w-full py-3 px-5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                         <path
                           fill="#4285F4"
                           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
