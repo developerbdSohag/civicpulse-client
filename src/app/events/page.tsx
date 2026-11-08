@@ -6,8 +6,10 @@ import { EventItem } from '@/types';
 import { eventsAPI } from '@/lib/api';
 import EventCard from '@/components/events/EventCard';
 import { EventCardSkeleton } from '@/components/common/LoadingSkeleton';
-import { Search, Filter, Calendar, MapPin, Sparkles, Plus, RotateCcw, Loader2 } from 'lucide-react';
+import { Search, Filter, Calendar, MapPin, Sparkles, Plus, RotateCcw, Loader2, Trees } from 'lucide-react';
 import Link from 'next/link';
+import { mergeCommunityEvents, syncCommunityEventsToServer } from '@/lib/communityEvents';
+import TreePlantationGrowthModal from '@/components/animations/TreePlantationGrowthModal';
 
 const CATEGORIES = [
   'All',
@@ -26,6 +28,7 @@ function EventsContent() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [showTreeModal, setShowTreeModal] = useState(false);
 
   // Filter state
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -41,18 +44,43 @@ function EventsContent() {
         sort: sort,
       });
 
-      if (res.success && res.events) {
-        let evts = [...res.events];
-        if (sort === 'date_asc') {
-          evts.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
-        } else if (sort === 'date_desc') {
-          evts.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
-        }
-        setEvents(evts);
-        setTotalCount(res.totalCount || evts.length);
+      // Merge server events with locally created/saved community events
+      let rawEvents = res.success && res.events ? res.events : [];
+      let evts = mergeCommunityEvents(rawEvents);
+
+      // Apply type filtering if specified
+      if (selectedType && selectedType !== 'All') {
+        evts = evts.filter((e) => e.eventType.toLowerCase() === selectedType.toLowerCase());
       }
+
+      // Apply search query filtering
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        evts = evts.filter(
+          (e) =>
+            e.title.toLowerCase().includes(q) ||
+            e.location.toLowerCase().includes(q) ||
+            e.description.toLowerCase().includes(q)
+        );
+      }
+
+      if (sort === 'date_asc') {
+        evts.sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+      } else if (sort === 'date_desc') {
+        evts.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
+      }
+
+      setEvents(evts);
+      setTotalCount(evts.length);
+
+      // Background synchronization
+      syncCommunityEventsToServer().catch(() => {});
     } catch (err) {
       console.error('Error fetching upcoming events:', err);
+      // Fallback: load directly from community registry
+      const local = mergeCommunityEvents([]);
+      setEvents(local);
+      setTotalCount(local.length);
     } finally {
       setLoading(false);
     }
@@ -98,6 +126,37 @@ function EventsContent() {
           <Plus className="w-4 h-4" />
           <span>Host New Event</span>
         </Link>
+      </div>
+
+      {/* Interactive Movable Animation Banner: Tree Plantation Seed-to-Harvest */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+            <span className="text-2xl animate-bounce">🌱</span>
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Interactive Tree Plantation Experience
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 animate-pulse">
+                Seed to Harvest Animation
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+              Click to watch an interactive animated tree develop from a seed in fertile soil to full leafy canopy &amp; fruit harvest!
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowTreeModal(true)}
+          className="btn-magnetic btn-steel-primary px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-2 shadow-sm cursor-pointer"
+        >
+          <Trees className="w-4 h-4 text-emerald-200" />
+          <span>Launch Tree Animation</span>
+        </button>
       </div>
 
       {/* Filter and Search Toolbar */}
@@ -149,14 +208,19 @@ function EventsContent() {
             <button
               key={cat}
               type="button"
-              onClick={() => setSelectedType(cat)}
+              onClick={() => {
+                setSelectedType(cat);
+                if (cat === 'Plantation') {
+                  setShowTreeModal(true);
+                }
+              }}
               className={`btn-magnetic px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
                 selectedType === cat
                   ? 'btn-steel-primary font-bold'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200/60 dark:border-gray-700/60'
               }`}
             >
-              {cat}
+              {cat === 'Plantation' ? '🌱 Plantation (Interactive)' : cat}
             </button>
           ))}
           {(search || selectedType !== 'All' || sort !== 'date_asc') && (
@@ -217,6 +281,13 @@ function EventsContent() {
           ))}
         </div>
       )}
+
+      {/* Interactive Tree Plantation Modal */}
+      <TreePlantationGrowthModal
+        isOpen={showTreeModal}
+        onClose={() => setShowTreeModal(false)}
+        onExplorePlantations={() => setSelectedType('Plantation')}
+      />
     </div>
   );
 }

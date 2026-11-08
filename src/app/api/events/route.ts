@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUpcomingEvents, createEvent, verifyAuthToken, findUserById } from '@/server/store';
+import { getUpcomingEvents, createEvent, verifyAuthToken, findUserByIdOrToken } from '@/server/store';
 
 export async function GET(req: Request) {
   try {
@@ -36,10 +36,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = findUserById(auth.id);
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found.' }, { status: 404 });
-    }
+    const user = findUserByIdOrToken(auth);
 
     const body = await req.json();
     const { title, description, eventType, thumbnail, location, eventDate, targetVolunteers } = body;

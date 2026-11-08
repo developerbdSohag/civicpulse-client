@@ -33,6 +33,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { saveCommunityEvent, removeCommunityEvent, getCommunityEvents } from '@/lib/communityEvents';
 
 const EVENT_TYPES = [
   'Donation',
@@ -128,6 +129,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
       });
 
       if (res.success && res.event) {
+        saveCommunityEvent(res.event);
         toast.success('Event updated successfully!');
         setEvent(res.event);
         setEditModalOpen(false);
@@ -146,6 +148,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
 
     try {
       setIsDeleting(true);
+      removeCommunityEvent(event._id);
       const res = await eventsAPI.delete(event._id);
       if (res.success) {
         toast.success('Event has been permanently deleted.');
@@ -165,14 +168,31 @@ export default function EventDetailsClient({ id }: { id: string }) {
     async function fetchEventDetails() {
       try {
         setLoading(true);
+
+        // Pre-check community events registry for instant display
+        const localEvents = getCommunityEvents();
+        const foundLocal = localEvents.find((e) => e._id === id);
+        if (foundLocal) {
+          setEvent(foundLocal);
+        }
+
         const res = await eventsAPI.getById(id);
         if (res.success && res.event) {
           setEvent(res.event);
           setHasJoined(res.hasJoined);
           setAttendees(res.attendees || []);
+        } else if (foundLocal) {
+          // If server didn't have it yet, keep local and sync to server
+          saveCommunityEvent(foundLocal);
         }
       } catch (err: any) {
-        toast.error('Failed to load event details.');
+        const localEvents = getCommunityEvents();
+        const foundLocal = localEvents.find((e) => e._id === id);
+        if (foundLocal) {
+          setEvent(foundLocal);
+        } else {
+          toast.error('Failed to load event details.');
+        }
       } finally {
         setLoading(false);
       }

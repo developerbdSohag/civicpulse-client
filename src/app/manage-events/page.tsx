@@ -24,6 +24,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { saveCommunityEvent, removeCommunityEvent, getCommunityEvents } from '@/lib/communityEvents';
 
 const EVENT_TYPES = [
   'Donation',
@@ -64,12 +65,23 @@ export default function ManageEventsPage() {
     try {
       setLoading(true);
       const res = await eventsAPI.getMyCreated();
-      if (res.success && res.events) {
-        const sorted = [...res.events].sort(
-          (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+      let combined = res.success && res.events ? [...res.events] : [];
+
+      // Merge locally created community events for this user
+      if (user?.email) {
+        const localCommunity = getCommunityEvents().filter(
+          (e) => e.creatorEmail.toLowerCase() === user.email.toLowerCase()
         );
-        setMyEvents(sorted);
+        const map = new Map<string, EventItem>();
+        for (const e of combined) map.set(e._id, e);
+        for (const e of localCommunity) map.set(e._id, e);
+        combined = Array.from(map.values());
       }
+
+      const sorted = combined.sort(
+        (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+      );
+      setMyEvents(sorted);
     } catch (err: any) {
       toast.error('Failed to load your organized events.');
     } finally {
@@ -137,6 +149,7 @@ export default function ManageEventsPage() {
       });
 
       if (res.success && res.event) {
+        saveCommunityEvent(res.event);
         toast.success('Event updated successfully!');
         setMyEvents((prev) =>
           prev.map((item) => (item._id === editingEvent._id ? res.event : item))
@@ -158,6 +171,7 @@ export default function ManageEventsPage() {
 
     try {
       setIsDeleting(true);
+      removeCommunityEvent(deletingId);
       const res = await eventsAPI.delete(deletingId);
       if (res.success) {
         toast.success('Event has been permanently deleted.');

@@ -25,6 +25,7 @@ import {
 import SafeImage from '@/components/common/SafeImage';
 import UserAvatar from '@/components/common/UserAvatar';
 import { toast } from 'sonner';
+import { saveCommunityEvent } from '@/lib/communityEvents';
 
 const EVENT_TYPES = [
   'Donation',
@@ -141,6 +142,9 @@ export default function CreateEventPage() {
       });
 
       if (res.success) {
+        if (res.event) {
+          saveCommunityEvent(res.event);
+        }
         confetti({
           particleCount: 100,
           spread: 80,

@@ -21,11 +21,14 @@ import {
   Quote,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { mergeCommunityEvents, syncCommunityEventsToServer } from '@/lib/communityEvents';
+import TreePlantationGrowthModal from '@/components/animations/TreePlantationGrowthModal';
 
 export default function HomePage() {
   const [recentEvents, setRecentEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [showTreeModal, setShowTreeModal] = useState(false);
 
   useEffect(() => {
     async function loadRecentEvents() {
@@ -33,14 +36,16 @@ export default function HomePage() {
         setLoading(true);
         // Using limit=6 which triggers MongoDB .limit(6) on the backend
         const res = await eventsAPI.getUpcoming({ limit: 6, sort: 'date_asc' });
-        if (res.success && res.events) {
-          const sorted = [...res.events].sort(
-            (a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
-          );
-          setRecentEvents(sorted);
-        }
+        const raw = res.success && res.events ? res.events : [];
+        const merged = mergeCommunityEvents(raw);
+        setRecentEvents(merged.slice(0, 6));
+
+        // Background sync
+        syncCommunityEventsToServer().catch(() => {});
       } catch (err) {
         console.error('Failed to load recent events:', err);
+        const local = mergeCommunityEvents([]);
+        setRecentEvents(local.slice(0, 6));
       } finally {
         setLoading(false);
       }
@@ -133,13 +138,14 @@ export default function HomePage() {
                   <span>Explore Upcoming Events</span>
                 </Link>
 
-                <Link
-                  href="/create-event"
-                  className="w-full sm:w-auto btn-magnetic btn-steel-secondary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold"
+                <button
+                  type="button"
+                  onClick={() => setShowTreeModal(true)}
+                  className="w-full sm:w-auto btn-magnetic btn-steel-secondary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold cursor-pointer border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:border-emerald-400"
                 >
-                  <Heart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Host an Initiative</span>
-                </Link>
+                  <span className="text-lg">🌱</span>
+                  <span>Tree Animation (Seed to Harvest)</span>
+                </button>
               </div>
 
               {/* Trust Indicators */}
@@ -330,34 +336,48 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryItems.map((item, index) => (
-              <div
-                key={index}
-                className="group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
-                style={{ position: 'relative', width: '100%', height: '18rem' }}
-              >
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1">
-                  <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-600 text-white">
-                    {item.category}
-                  </span>
-                  <h4 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                    {item.title}
-                  </h4>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-300">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{item.location}</span>
+            {galleryItems.map((item, index) => {
+              const isTree = item.category === 'Tree Plantation' || item.title.includes('Saplings');
+              return (
+                <div
+                  key={index}
+                  onClick={isTree ? () => setShowTreeModal(true) : undefined}
+                  className={`group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
+                    isTree ? 'cursor-pointer ring-2 ring-emerald-500/60 hover:ring-emerald-400 hover:scale-[1.02]' : ''
+                  }`}
+                  style={{ position: 'relative', width: '100%', height: '18rem' }}
+                  title={isTree ? 'Click to launch interactive Tree Plantation animation' : undefined}
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-600 text-white">
+                        {item.category}
+                      </span>
+                      {isTree && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-emerald-400 text-slate-900 shadow-sm animate-pulse">
+                          🌱 Seed to Harvest (Click Me)
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      {item.title}
+                    </h4>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-300">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>{item.location}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -483,6 +503,16 @@ export default function HomePage() {
           <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-80 h-80 rounded-full border border-white/10" />
         </div>
       </section>
+
+      {/* Interactive Tree Plantation Modal */}
+      <TreePlantationGrowthModal
+        isOpen={showTreeModal}
+        onClose={() => setShowTreeModal(false)}
+        onExplorePlantations={() => {
+          setShowTreeModal(false);
+          window.location.href = '/events?type=Plantation';
+        }}
+      />
     </div>
   );
 }

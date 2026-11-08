@@ -1,8 +1,34 @@
+import fs from 'fs';
+import path from 'path';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { EventItem, RSVPItem, User, Attendee } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'civicpulse_jwt_secret_key_secure_2026_social_platform';
+const CACHE_FILE = path.join(process.env.TEMP || process.env.TMPDIR || '/tmp', 'civicpulse_events_cache.json');
+
+function persistEventsToFile(eventsMap: Map<string, EventItem>) {
+  try {
+    const list = Array.from(eventsMap.values());
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(list), 'utf8');
+  } catch (_) {}
+}
+
+function restoreEventsFromFile(eventsMap: Map<string, EventItem>) {
+  try {
+    if (fs.existsSync(CACHE_FILE)) {
+      const raw = fs.readFileSync(CACHE_FILE, 'utf8');
+      const list: EventItem[] = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        for (const ev of list) {
+          if (ev && ev._id) {
+            eventsMap.set(ev._id, ev);
+          }
+        }
+      }
+    }
+  } catch (_) {}
+}
 
 export interface StoredUser extends User {
   password?: string;
@@ -238,6 +264,9 @@ export function initStore() {
   for (const ev of initialEvents) {
     store.events.set(ev._id, ev);
   }
+
+  // Restore any persistent community events created across sessions
+  restoreEventsFromFile(store.events);
 
   // Pre-seed RSVP
   const rsvp1: RSVPItem = {
@@ -548,20 +577,56 @@ export function createEvent(data: {
     updatedAt: new Date().toISOString(),
   };
   store.events.set(_id, newEvent);
+  persistEventsToFile(store.events);
   return newEvent;
+}
+
+export function syncEvents(incoming: EventItem[]): EventItem[] {
+  initStore();
+  const store = getStore();
+  for (const ev of incoming) {
+    if (ev && ev._id) {
+      store.events.set(ev._id, ev);
+    }
+  }
+  persistEventsToFile(store.events);
+  return Array.from(store.events.values());
 }
 
 export function updateEvent(id: string, updates: Partial<EventItem>): EventItem | null {
   initStore();
   const store = getStore();
-  const existing = store.events.get(id);
-  if (!existing) return null;
+  let existing = store.events.get(id);
+  if (!existing) {
+    // If missing in this worker instance, check if updates have required fields to restore
+    if (updates.title && updates.eventDate && updates.creatorEmail) {
+      existing = {
+        _id: id,
+        title: updates.title,
+        description: updates.description || '',
+        eventType: updates.eventType || 'Other',
+        thumbnail: updates.thumbnail || '',
+        location: updates.location || '',
+        eventDate: updates.eventDate,
+        targetVolunteers: updates.targetVolunteers || 50,
+        creatorEmail: updates.creatorEmail,
+        creatorName: updates.creatorName || 'Volunteer Organizer',
+        creatorPhoto: updates.creatorPhoto,
+        attendeesCount: updates.attendeesCount || 0,
+        createdAt: updates.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    } else {
+      return null;
+    }
+  }
   const updated: EventItem = {
     ...existing,
     ...updates,
     updatedAt: new Date().toISOString(),
   };
   store.events.set(id, updated);
+  persistEventsToFile(store.events);
   return updated;
 }
 
@@ -570,6 +635,7 @@ export function deleteEvent(id: string): boolean {
   const store = getStore();
   const deleted = store.events.delete(id);
   if (deleted) {
+    persistEventsToFile(store.events);
     // Delete associated RSVPs
     for (const [rsvpId, rsvp] of store.rsvps.entries()) {
       const eId = typeof rsvp.eventId === 'string' ? rsvp.eventId : (rsvp.eventId as any)?._id;
