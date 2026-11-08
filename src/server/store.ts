@@ -259,6 +259,12 @@ export function initStore() {
 }
 
 // User Helpers
+export function getUserIdForEmail(email: string): string {
+  const normalized = email.trim().toLowerCase();
+  const slug = normalized.replace(/[^a-z0-9]/g, '_');
+  return `user_${slug}`;
+}
+
 export function findUserByEmail(email: string): StoredUser | null {
   initStore();
   const store = getStore();
@@ -274,10 +280,67 @@ export function findUserByEmail(email: string): StoredUser | null {
 export function findUserById(id: string): StoredUser | null {
   initStore();
   const store = getStore();
-  return store.users.get(id) || null;
+  const direct = store.users.get(id);
+  if (direct) return direct;
+
+  // Fallback match: check if id matches a user's _id or deterministic email slug
+  for (const user of store.users.values()) {
+    if (user.id === id || user._id === id || getUserIdForEmail(user.email) === id) {
+      return user;
+    }
+  }
+  return null;
+}
+
+export interface AuthUserPayload {
+  id: string;
+  email: string;
+  name: string;
+  photoURL?: string;
+  bio?: string;
+  phone?: string;
+  location?: string;
+}
+
+export function findUserByIdOrToken(auth: AuthUserPayload): StoredUser {
+  initStore();
+  const store = getStore();
+  const normalizedEmail = (auth.email || '').trim().toLowerCase();
+
+  // 1. Try finding by ID
+  if (auth.id) {
+    const byId = findUserById(auth.id);
+    if (byId) return byId;
+  }
+
+  // 2. Try finding by normalized email
+  if (normalizedEmail) {
+    const byEmail = findUserByEmail(normalizedEmail);
+    if (byEmail) return byEmail;
+  }
+
+  // 3. Self-healing rehydration: restore user in this lambda instance from the verified JWT payload
+  const id = auth.id || getUserIdForEmail(normalizedEmail);
+  const restoredUser: StoredUser = {
+    id,
+    _id: id,
+    name: auth.name || (normalizedEmail ? normalizedEmail.split('@')[0] : 'Volunteer'),
+    email: normalizedEmail,
+    photoURL:
+      auth.photoURL ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(auth.name || normalizedEmail)}`,
+    bio: auth.bio || '',
+    phone: auth.phone || '',
+    location: auth.location || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  store.users.set(id, restoredUser);
+  return restoredUser;
 }
 
 export function createUser(data: {
+  id?: string;
   name: string;
   email: string;
   password?: string;
@@ -288,12 +351,30 @@ export function createUser(data: {
 }): StoredUser {
   initStore();
   const store = getStore();
-  const id = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+  const normalizedEmail = data.email.trim().toLowerCase();
+  const id = data.id || getUserIdForEmail(normalizedEmail);
+
+  // If user already exists in store, update and return
+  const existing = store.users.get(id) || findUserByEmail(normalizedEmail);
+  if (existing) {
+    if (data.name && (existing.name === 'Google User' || !existing.name || existing.name.includes('@'))) {
+      existing.name = data.name;
+    }
+    if (data.photoURL && (!existing.photoURL || existing.photoURL.includes('dicebear'))) {
+      existing.photoURL = data.photoURL;
+    }
+    if (data.bio && !existing.bio) existing.bio = data.bio;
+    if (data.phone && !existing.phone) existing.phone = data.phone;
+    if (data.location && !existing.location) existing.location = data.location;
+    store.users.set(existing.id, existing);
+    return existing;
+  }
+
   const newUser: StoredUser = {
     id,
     _id: id,
     name: data.name,
-    email: data.email.trim().toLowerCase(),
+    email: normalizedEmail,
     password: data.password ? bcrypt.hashSync(data.password, 10) : undefined,
     photoURL: data.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name)}`,
     bio: data.bio || '',
@@ -305,13 +386,42 @@ export function createUser(data: {
   return newUser;
 }
 
-export function updateUser(id: string, updates: Partial<StoredUser>): StoredUser | null {
+export function updateUser(idOrEmail: string, updates: Partial<StoredUser>): StoredUser {
   initStore();
   const store = getStore();
-  const existing = store.users.get(id);
-  if (!existing) return null;
-  const updated = { ...existing, ...updates };
-  store.users.set(id, updated);
+  let existing: StoredUser | null | undefined = store.users.get(idOrEmail);
+
+  if (!existing) {
+    // Check by email or deterministic id
+    existing = findUserByEmail(idOrEmail) || findUserById(idOrEmail);
+  }
+
+  if (!existing) {
+    // Self-heal: create record immediately so profile update never fails
+    const email = idOrEmail.includes('@') ? idOrEmail.trim().toLowerCase() : updates.email || '';
+    const id = getUserIdForEmail(email || idOrEmail);
+    existing = {
+      id,
+      _id: id,
+      name: updates.name || (email ? email.split('@')[0] : 'Volunteer'),
+      email: email,
+      photoURL: updates.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(updates.name || 'Volunteer')}`,
+      bio: updates.bio || '',
+      phone: updates.phone || '',
+      location: updates.location || '',
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  const updated: StoredUser = {
+    ...existing,
+    ...updates,
+    id: existing.id,
+    _id: existing._id || existing.id,
+    email: existing.email, // preserve immutable email
+  };
+
+  store.users.set(updated.id, updated);
   return updated;
 }
 
@@ -609,13 +719,17 @@ export function signToken(user: StoredUser): string {
       id: user.id,
       email: user.email,
       name: user.name,
+      photoURL: user.photoURL,
+      bio: user.bio || '',
+      phone: user.phone || '',
+      location: user.location || '',
     },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
 }
 
-export function verifyAuthToken(req: Request): { id: string; email: string; name: string } | null {
+export function verifyAuthToken(req: Request): AuthUserPayload | null {
   try {
     let token = '';
     const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
@@ -634,7 +748,15 @@ export function verifyAuthToken(req: Request): { id: string; email: string; name
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    return decoded;
+    return {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name,
+      photoURL: decoded.photoURL,
+      bio: decoded.bio,
+      phone: decoded.phone,
+      location: decoded.location,
+    };
   } catch (err) {
     return null;
   }

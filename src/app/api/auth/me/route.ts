@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyAuthToken, findUserById } from '@/server/store';
+import { verifyAuthToken, findUserByIdOrToken } from '@/server/store';
 
 export async function GET(req: Request) {
   try {
@@ -8,19 +8,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = findUserById(auth.id);
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
-    }
+    const user = findUserByIdOrToken(auth);
 
     const safeUser = {
       id: user.id,
       name: user.name,
       email: user.email,
       photoURL: user.photoURL,
-      bio: user.bio,
-      phone: user.phone,
-      location: user.location,
+      bio: user.bio || '',
+      phone: user.phone || '',
+      location: user.location || '',
     };
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
-  findUserById,
+  findUserByIdOrToken,
   getEventsByCreator,
   getUserRSVPs,
   verifyAuthToken,
@@ -13,10 +13,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = findUserById(auth.id);
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
-    }
+    const user = findUserByIdOrToken(auth);
 
     const createdEvents = getEventsByCreator(user.email).length;
     const joinedEvents = getUserRSVPs(user.email).length;

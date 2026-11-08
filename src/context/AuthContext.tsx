@@ -63,8 +63,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .getMe()
           .then((res) => {
             if (res.success && res.user) {
-              setUser(res.user);
-              localStorage.setItem('civicpulse_user', JSON.stringify(res.user));
+              let mergedUser = res.user;
+              try {
+                const vaultStr = localStorage.getItem(`civicpulse_vault_${res.user.email.toLowerCase()}`);
+                if (vaultStr) {
+                  const vault = JSON.parse(vaultStr);
+                  mergedUser = {
+                    ...mergedUser,
+                    name: mergedUser.name || vault.name || '',
+                    bio: mergedUser.bio || vault.bio || '',
+                    phone: mergedUser.phone || vault.phone || '',
+                    location: mergedUser.location || vault.location || '',
+                    photoURL: mergedUser.photoURL || vault.photoURL || '',
+                  };
+                }
+              } catch (_) {}
+
+              setUser(mergedUser);
+              localStorage.setItem('civicpulse_user', JSON.stringify(mergedUser));
             }
           })
           .catch(() => {
@@ -83,10 +99,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleAuthSuccess = (userData: User, authToken: string) => {
-    setUser(userData);
+    let effectiveUser = userData;
+    try {
+      const vaultStr = localStorage.getItem(`civicpulse_vault_${userData.email.toLowerCase()}`);
+      if (vaultStr) {
+        const vault = JSON.parse(vaultStr);
+        effectiveUser = {
+          ...effectiveUser,
+          name: vault.name || effectiveUser.name,
+          bio: vault.bio || effectiveUser.bio || '',
+          phone: vault.phone || effectiveUser.phone || '',
+          location: vault.location || effectiveUser.location || '',
+          photoURL: vault.photoURL || effectiveUser.photoURL || '',
+        };
+      } else {
+        localStorage.setItem(`civicpulse_vault_${userData.email.toLowerCase()}`, JSON.stringify(userData));
+      }
+    } catch (_) {}
+
+    setUser(effectiveUser);
     setToken(authToken);
     localStorage.setItem('civicpulse_token', authToken);
-    localStorage.setItem('civicpulse_user', JSON.stringify(userData));
+    localStorage.setItem('civicpulse_user', JSON.stringify(effectiveUser));
     document.cookie = `civicpulse_token=${authToken}; path=/; max-age=604800; SameSite=Lax`;
   };
 
@@ -160,7 +194,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser((prev) => {
       if (!prev) return null;
       const updated = { ...prev, ...updatedFields };
-      localStorage.setItem('civicpulse_user', JSON.stringify(updated));
+      try {
+        localStorage.setItem('civicpulse_user', JSON.stringify(updated));
+        if (updated.email) {
+          localStorage.setItem(`civicpulse_vault_${updated.email.toLowerCase()}`, JSON.stringify(updated));
+        }
+      } catch (_) {}
       return updated;
     });
   };

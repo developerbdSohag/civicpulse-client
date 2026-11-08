@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { updateUser, verifyAuthToken } from '@/server/store';
+import { updateUser, verifyAuthToken, findUserByIdOrToken, signToken } from '@/server/store';
 
 export async function PUT(req: Request) {
   try {
@@ -11,34 +11,51 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { name, photoURL, bio, phone, location } = body;
 
-    const updates: any = {};
-    if (name) updates.name = name;
-    if (photoURL !== undefined) updates.photoURL = photoURL;
-    if (bio !== undefined) updates.bio = bio;
-    if (phone !== undefined) updates.phone = phone;
-    if (location !== undefined) updates.location = location;
+    // Self-healing user resolution: guaranteed to resolve or instantiate from verified token
+    const user = findUserByIdOrToken(auth);
 
-    const updated = updateUser(auth.id, updates);
-    if (!updated) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
-    }
+    const updates: any = {};
+    if (name && name.trim()) updates.name = name.trim();
+    if (photoURL !== undefined) updates.photoURL = photoURL.trim();
+    if (bio !== undefined) updates.bio = bio.trim();
+    if (phone !== undefined) updates.phone = phone.trim();
+    if (location !== undefined) updates.location = location.trim();
+
+    const updated = updateUser(user.id, updates);
+    const finalUser = updated || user;
+
+    // Issue refreshed token containing newly updated profile data
+    const newToken = signToken(finalUser);
 
     const safeUser = {
-      id: updated.id,
-      name: updated.name,
-      email: updated.email,
-      photoURL: updated.photoURL,
-      bio: updated.bio || '',
-      phone: updated.phone || '',
-      location: updated.location || '',
+      id: finalUser.id,
+      name: finalUser.name,
+      email: finalUser.email,
+      photoURL: finalUser.photoURL,
+      bio: finalUser.bio || '',
+      phone: finalUser.phone || '',
+      location: finalUser.location || '',
     };
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Profile updated successfully!',
       user: safeUser,
+      token: newToken,
     });
+
+    response.cookies.set('token', newToken, {
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    response.cookies.set('civicpulse_token', newToken, {
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error: any) {
+    console.error('Profile update error:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to update profile.' },
       { status: 500 }

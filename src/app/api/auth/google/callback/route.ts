@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findUserByEmail, createUser, signToken } from '@/server/store';
+import { findUserByEmail, createUser, signToken, getUserIdForEmail } from '@/server/store';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -81,10 +81,12 @@ export async function GET(req: Request) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+    const deterministicId = getUserIdForEmail(normalizedEmail);
     let user = findUserByEmail(normalizedEmail);
 
     if (!user) {
       user = createUser({
+        id: deterministicId,
         name: name || normalizedEmail.split('@')[0],
         email: normalizedEmail,
         password: 'GoogleOAuthUser@CivicPulse2026',
@@ -104,6 +106,10 @@ export async function GET(req: Request) {
     // Redirect to events and attach token query param + set cookie for instant session sync
     const redirectResponse = NextResponse.redirect(`${origin}/events?token=${token}&auth=google_success`);
     redirectResponse.cookies.set('token', token, {
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    redirectResponse.cookies.set('civicpulse_token', token, {
       path: '/',
       maxAge: 7 * 24 * 60 * 60,
     });

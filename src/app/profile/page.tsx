@@ -95,13 +95,68 @@ export default function ProfilePage() {
     async function loadProfile() {
       try {
         setLoading(true);
+
+        // Preload any local vault data for instant responsiveness
+        if (user?.email) {
+          try {
+            const vaultStr = localStorage.getItem(`civicpulse_vault_${user.email.toLowerCase()}`);
+            if (vaultStr) {
+              const vault = JSON.parse(vaultStr);
+              if (vault.name) setName(vault.name);
+              if (vault.photoURL) setPhotoURL(vault.photoURL);
+              if (vault.bio) setBio(vault.bio);
+              if (vault.phone) setPhone(vault.phone);
+              if (vault.location) setLocation(vault.location);
+            }
+          } catch (_) {}
+        }
+
         const res = await profileAPI.getMe();
         if (res.success && res.user) {
-          setName(res.user.name || '');
-          setPhotoURL(res.user.photoURL || '');
-          setBio(res.user.bio || '');
-          setPhone(res.user.phone || '');
-          setLocation(res.user.location || '');
+          let mergedUser = res.user;
+
+          // Merge with persistent vault if server fields are blank (e.g. after fresh Google sign-in)
+          if (user?.email) {
+            try {
+              const vaultStr = localStorage.getItem(`civicpulse_vault_${user.email.toLowerCase()}`);
+              if (vaultStr) {
+                const vault = JSON.parse(vaultStr);
+                const hasLocalCustomizations =
+                  (!mergedUser.phone && vault.phone) ||
+                  (!mergedUser.bio && vault.bio) ||
+                  (!mergedUser.location && vault.location) ||
+                  (vault.name && vault.name !== mergedUser.name);
+
+                mergedUser = {
+                  ...mergedUser,
+                  name: vault.name || mergedUser.name || '',
+                  photoURL: vault.photoURL || mergedUser.photoURL || '',
+                  bio: vault.bio || mergedUser.bio || '',
+                  phone: vault.phone || mergedUser.phone || '',
+                  location: vault.location || mergedUser.location || '',
+                };
+
+                // Auto-sync client vault to server to keep database synchronized
+                if (hasLocalCustomizations) {
+                  profileAPI
+                    .update({
+                      name: mergedUser.name,
+                      photoURL: mergedUser.photoURL,
+                      bio: mergedUser.bio,
+                      phone: mergedUser.phone,
+                      location: mergedUser.location,
+                    })
+                    .catch(() => {});
+                }
+              }
+            } catch (_) {}
+          }
+
+          setName(mergedUser.name || '');
+          setPhotoURL(mergedUser.photoURL || '');
+          setBio(mergedUser.bio || '');
+          setPhone(mergedUser.phone || '');
+          setLocation(mergedUser.location || '');
           if (res.stats) {
             setStats(res.stats);
           }
@@ -126,24 +181,44 @@ export default function ProfilePage() {
       return;
     }
 
+    const payload = {
+      name: name.trim(),
+      photoURL: photoURL.trim(),
+      bio: bio.trim(),
+      phone: phone.trim(),
+      location: location.trim(),
+    };
+
     try {
       setSaving(true);
-      const res = await profileAPI.update({
-        name: name.trim(),
-        photoURL: photoURL.trim(),
-        bio: bio.trim(),
-        phone: phone.trim(),
-        location: location.trim(),
-      });
+      const res = await profileAPI.update(payload);
 
       if (res.success && res.user) {
         updateUser(res.user);
+        if ((res as any).token) {
+          localStorage.setItem('civicpulse_token', (res as any).token);
+        }
+        if (res.user.email) {
+          try {
+            localStorage.setItem(`civicpulse_vault_${res.user.email.toLowerCase()}`, JSON.stringify(res.user));
+          } catch (_) {}
+        }
         toast.success(res.message || 'Profile updated successfully!');
       } else {
         toast.error(res.message || 'Failed to update profile.');
       }
     } catch (err: any) {
-      toast.error(err.message || 'Error updating profile.');
+      // Graceful fallback: save locally so user edits are NEVER lost
+      if (user?.email) {
+        const localUpdated = { ...user, ...payload };
+        updateUser(localUpdated);
+        try {
+          localStorage.setItem(`civicpulse_vault_${user.email.toLowerCase()}`, JSON.stringify(localUpdated));
+        } catch (_) {}
+        toast.success('Profile saved securely to your device!');
+      } else {
+        toast.error(err.message || 'Error updating profile.');
+      }
     } finally {
       setSaving(false);
     }
