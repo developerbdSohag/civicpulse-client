@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import CivicAuthLightModal from '@/components/animations/CivicAuthLightModal';
 
 function LoginFormContent() {
   const { login } = useAuth();
@@ -23,6 +24,7 @@ function LoginFormContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +39,11 @@ function LoginFormContent() {
     setLoading(false);
 
     if (result.success) {
+      setShowLoginModal(true);
       toast.success(result.message || 'Logged in successfully! Welcome back.');
-      router.push(redirectUrl);
+      setTimeout(() => {
+        router.push(redirectUrl);
+      }, 1800);
     } else {
       toast.error(result.message || 'Invalid email or password.');
     }
@@ -163,6 +168,9 @@ function LoginFormContent() {
           </Link>
         </p>
       </div>
+
+      {/* Login Light Ignite Modal */}
+      <CivicAuthLightModal isOpen={showLoginModal} mode="login" userName={email.split('@')[0] || 'Volunteer'} />
     </div>
   );
 }

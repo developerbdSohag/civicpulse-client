@@ -9,7 +9,7 @@ import { EventCardSkeleton } from '@/components/common/LoadingSkeleton';
 import { Search, Filter, Calendar, MapPin, Sparkles, Plus, RotateCcw, Loader2, Trees } from 'lucide-react';
 import Link from 'next/link';
 import { mergeCommunityEvents, syncCommunityEventsToServer } from '@/lib/communityEvents';
-import TreePlantationGrowthModal from '@/components/animations/TreePlantationGrowthModal';
+import CivicCategoryAnimationModal, { CivicCategoryKey } from '@/components/animations/CivicCategoryAnimationModal';
 
 const CATEGORIES = [
   'All',
@@ -28,7 +28,8 @@ function EventsContent() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
-  const [showTreeModal, setShowTreeModal] = useState(false);
+  const [selectedAnimCategory, setSelectedAnimCategory] = useState<CivicCategoryKey>('Plantation');
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   // Filter state
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -128,34 +129,38 @@ function EventsContent() {
         </Link>
       </div>
 
-      {/* Interactive Movable Animation Banner: Tree Plantation Seed-to-Harvest */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
+      {/* Interactive Movable Animation Banner: All Civic Categories */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-indigo-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
-            <span className="text-2xl animate-bounce">🌱</span>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md">
+            <span className="text-2xl animate-pulse">✨</span>
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Interactive Tree Plantation Experience
+                Interactive Civic Action Simulator
               </h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 animate-pulse">
-                Seed to Harvest Animation
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                All 6 Categories Animated
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Click to watch an interactive animated tree develop from a seed in fertile soil to full leafy canopy &amp; fruit harvest!
+              Watch step-by-step animations: Giving donations to the needy, cleaning dirty places, tree growth from seed to harvest, healthcare healing, literacy, and flood rescue!
             </p>
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => setShowTreeModal(true)}
+          onClick={() => {
+            const catKey = selectedType !== 'All' ? (selectedType as CivicCategoryKey) : 'Plantation';
+            setSelectedAnimCategory(catKey);
+            setShowCategoryModal(true);
+          }}
           className="btn-magnetic btn-steel-primary px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-2 shadow-sm cursor-pointer"
         >
-          <Trees className="w-4 h-4 text-emerald-200" />
-          <span>Launch Tree Animation</span>
+          <Sparkles className="w-4 h-4 text-emerald-200" />
+          <span>Launch Category Animations</span>
         </button>
       </div>
 
@@ -204,25 +209,37 @@ function EventsContent() {
             <Filter className="w-3.5 h-3.5" />
             Category:
           </span>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => {
-                setSelectedType(cat);
-                if (cat === 'Plantation') {
-                  setShowTreeModal(true);
-                }
-              }}
-              className={`btn-magnetic px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
-                selectedType === cat
-                  ? 'btn-steel-primary font-bold'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200/60 dark:border-gray-700/60'
-              }`}
-            >
-              {cat === 'Plantation' ? '🌱 Plantation (Interactive)' : cat}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const catIcons: Record<string, string> = {
+              Plantation: '🌱',
+              Donation: '💝',
+              Cleanup: '🧹',
+              Healthcare: '🩺',
+              Education: '📚',
+              'Relief Aid': '🌊',
+            };
+            const icon = catIcons[cat] ? `${catIcons[cat]} ` : '';
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setSelectedType(cat);
+                  if (cat !== 'All') {
+                    setSelectedAnimCategory(cat as CivicCategoryKey);
+                    setShowCategoryModal(true);
+                  }
+                }}
+                className={`btn-magnetic px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
+                  selectedType === cat
+                    ? 'btn-steel-primary font-bold'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200/60 dark:border-gray-700/60'
+                }`}
+              >
+                {icon}{cat}
+              </button>
+            );
+          })}
           {(search || selectedType !== 'All' || sort !== 'date_asc') && (
             <button
               type="button"
@@ -282,11 +299,15 @@ function EventsContent() {
         </div>
       )}
 
-      {/* Interactive Tree Plantation Modal */}
-      <TreePlantationGrowthModal
-        isOpen={showTreeModal}
-        onClose={() => setShowTreeModal(false)}
-        onExplorePlantations={() => setSelectedType('Plantation')}
+      {/* Interactive Civic Action Simulator Modal */}
+      <CivicCategoryAnimationModal
+        isOpen={showCategoryModal}
+        initialCategory={selectedAnimCategory}
+        onClose={() => setShowCategoryModal(false)}
+        onExploreCategory={(cat) => {
+          setSelectedType(cat);
+          setShowCategoryModal(false);
+        }}
       />
     </div>
   );

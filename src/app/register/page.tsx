@@ -29,6 +29,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import RegistrationGrowthTree from '@/components/animations/RegistrationGrowthTree';
+import CivicAuthLightModal from '@/components/animations/CivicAuthLightModal';
 
 const BD_DISTRICTS = [
   'Dhaka (Mirpur, Mohammadpur, Dhanmondi)',
@@ -77,6 +79,7 @@ function RegisterContent() {
   const [selectedCauses, setSelectedCauses] = useState<string[]>([CAUSES[0], CAUSES[1]]);
 
   const [loading, setLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     if (queryEmail) setEmail(queryEmail);
@@ -156,15 +159,19 @@ function RegisterContent() {
       );
 
       if (result.success) {
+        setIsCompleted(true);
         try {
           confetti({
-            particleCount: 100,
-            spread: 70,
+            particleCount: 120,
+            spread: 80,
             origin: { y: 0.6 },
+            colors: ['#10b981', '#34d399', '#f59e0b', '#3b82f6', '#ec4899'],
           });
         } catch (_) {}
-        toast.success(`🎉 Welcome to CivicPulse, ${name.trim()}! Your volunteer profile is ready.`);
-        router.push('/events');
+        toast.success(`🎉 Welcome to CivicPulse, ${name.trim()}! Your tree is grown and your civic light is shining!`);
+        setTimeout(() => {
+          router.push('/events');
+        }, 2200);
       } else {
         toast.error(result.message || 'Registration failed. Please try again.');
       }
@@ -244,6 +251,9 @@ function RegisterContent() {
               <p className="text-emerald-50/90 text-[14.5px] leading-relaxed font-normal">
                 Join passionate volunteers and grassroots leaders creating lasting social impact with warm winter clothes, food relief, and cleanups across 64 districts.
               </p>
+
+              {/* Step-by-Step Tree & Light Growth Animation */}
+              <RegistrationGrowthTree step={step} isCompleted={isCompleted} />
 
               {/* Feature Points with elevated glass containers */}
               <div className="space-y-4 pt-2">
@@ -735,6 +745,9 @@ function RegisterContent() {
           </div>
         </div>
       </div>
+
+      {/* Completion Light & Tree Celebration Modal */}
+      <CivicAuthLightModal isOpen={isCompleted} mode="login" userName={name || 'Volunteer'} />
     </div>
   );
 }

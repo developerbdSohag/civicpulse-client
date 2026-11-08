@@ -144,6 +144,88 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   animation: fruitGlow 2.5s ease-in-out infinite;
 }
 
+/* Civic Category Animations (Donation, Cleanup, Healthcare, Education, Relief) */
+@keyframes heartbeatPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.4)); }
+  15% { transform: scale(1.18); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8)); }
+  30% { transform: scale(1.05); }
+  45% { transform: scale(1.22); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9)); }
+  60% { transform: scale(1); }
+}
+
+@keyframes sweepBroom {
+  0%, 100% { transform: rotate(-8deg) translateX(-4px); }
+  50% { transform: rotate(18deg) translateX(8px); }
+}
+
+@keyframes sparkleGlint {
+  0%, 100% { opacity: 0.2; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.25) rotate(45deg); filter: drop-shadow(0 0 6px #10b981); }
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes waterFloat {
+  0%, 100% { transform: translateY(0px) rotate(-1deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes lanternFlame {
+  0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.9)); }
+  33% { transform: scale(1.1, 0.95) translateY(-2px); filter: drop-shadow(0 0 18px rgba(251, 191, 36, 1)); }
+  66% { transform: scale(0.95, 1.05) translateY(1px); filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.8)); }
+}
+
+@keyframes lightOutDim {
+  0% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 30px rgba(251, 191, 36, 0.8)); }
+  60% { opacity: 0.6; filter: brightness(0.7) drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+  100% { opacity: 0.15; filter: brightness(0.2) drop-shadow(0 0 2px rgba(100, 116, 139, 0.2)); }
+}
+
+@keyframes lightIgnite {
+  0% { opacity: 0.1; transform: scale(0.8); filter: brightness(0.2); }
+  40% { opacity: 0.7; transform: scale(1.05); filter: brightness(1.1) drop-shadow(0 0 25px rgba(16, 185, 129, 0.8)); }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1.3) drop-shadow(0 0 40px rgba(52, 211, 153, 0.9)); }
+}
+
+.animate-heartbeat {
+  animation: heartbeatPulse 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-sweep {
+  animation: sweepBroom 1.4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.animate-sparkle {
+  animation: sparkleGlint 2s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 3s ease-in-out infinite;
+}
+
+.animate-water-float {
+  animation: waterFloat 2.6s ease-in-out infinite;
+}
+
+.animate-lantern-flame {
+  animation: lanternFlame 1.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.animate-light-dim {
+  animation: lightOutDim 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-light-ignite {
+  animation: lightIgnite 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
 /* ==========================================================================
    Magnetic Steel Tactile Button System
    Physics: Magnetic attraction & acceleration on hover, snap latch on click

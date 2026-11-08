@@ -22,13 +22,14 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { mergeCommunityEvents, syncCommunityEventsToServer } from '@/lib/communityEvents';
-import TreePlantationGrowthModal from '@/components/animations/TreePlantationGrowthModal';
+import CivicCategoryAnimationModal, { CivicCategoryKey } from '@/components/animations/CivicCategoryAnimationModal';
 
 export default function HomePage() {
   const [recentEvents, setRecentEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [showTreeModal, setShowTreeModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [selectedAnimCategory, setSelectedAnimCategory] = useState<CivicCategoryKey>('Plantation');
 
   useEffect(() => {
     async function loadRecentEvents() {
@@ -140,11 +141,14 @@ export default function HomePage() {
 
                 <button
                   type="button"
-                  onClick={() => setShowTreeModal(true)}
+                  onClick={() => {
+                    setSelectedAnimCategory('Plantation');
+                    setShowCategoryModal(true);
+                  }}
                   className="w-full sm:w-auto btn-magnetic btn-steel-secondary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold cursor-pointer border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:border-emerald-400"
                 >
-                  <span className="text-lg">🌱</span>
-                  <span>Tree Animation (Seed to Harvest)</span>
+                  <Sparkles className="w-5 h-5 text-emerald-500" />
+                  <span>Civic Animations (All 6 Categories)</span>
                 </button>
               </div>
 
@@ -337,16 +341,25 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryItems.map((item, index) => {
-              const isTree = item.category === 'Tree Plantation' || item.title.includes('Saplings');
+              const categoryMap: Record<string, CivicCategoryKey> = {
+                'Clothing Distribution': 'Donation',
+                'Urban Cleanup': 'Cleanup',
+                'Education Aid': 'Education',
+                'Tree Plantation': 'Plantation',
+                'Community Health': 'Healthcare',
+                'Food Relief': 'Relief Aid',
+              };
+              const animKey = categoryMap[item.category] || 'Plantation';
               return (
                 <div
                   key={index}
-                  onClick={isTree ? () => setShowTreeModal(true) : undefined}
-                  className={`group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
-                    isTree ? 'cursor-pointer ring-2 ring-emerald-500/60 hover:ring-emerald-400 hover:scale-[1.02]' : ''
-                  }`}
+                  onClick={() => {
+                    setSelectedAnimCategory(animKey);
+                    setShowCategoryModal(true);
+                  }}
+                  className="group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer ring-1 ring-slate-300 dark:ring-slate-800 hover:ring-2 hover:ring-emerald-400 hover:scale-[1.02]"
                   style={{ position: 'relative', width: '100%', height: '18rem' }}
-                  title={isTree ? 'Click to launch interactive Tree Plantation animation' : undefined}
+                  title={`Click to launch ${item.category} interactive animation`}
                 >
                   <Image
                     src={item.image}
@@ -361,11 +374,9 @@ export default function HomePage() {
                       <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-600 text-white">
                         {item.category}
                       </span>
-                      {isTree && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-emerald-400 text-slate-900 shadow-sm animate-pulse">
-                          🌱 Seed to Harvest (Click Me)
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-emerald-400 text-slate-900 shadow-sm animate-pulse">
+                        🎬 Watch Animation
+                      </span>
                     </div>
                     <h4 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
                       {item.title}
@@ -504,13 +515,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Interactive Tree Plantation Modal */}
-      <TreePlantationGrowthModal
-        isOpen={showTreeModal}
-        onClose={() => setShowTreeModal(false)}
-        onExplorePlantations={() => {
-          setShowTreeModal(false);
-          window.location.href = '/events?type=Plantation';
+      {/* Interactive Civic Category Animation Modal */}
+      <CivicCategoryAnimationModal
+        isOpen={showCategoryModal}
+        initialCategory={selectedAnimCategory}
+        onClose={() => setShowCategoryModal(false)}
+        onExploreCategory={(cat) => {
+          setShowCategoryModal(false);
+          window.location.href = `/events?type=${encodeURIComponent(cat)}`;
         }}
       />
     </div>

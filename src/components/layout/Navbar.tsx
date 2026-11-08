@@ -23,6 +23,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import CivicAuthLightModal from '@/components/animations/CivicAuthLightModal';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -32,6 +33,7 @@ export default function Navbar() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -46,11 +48,15 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    logout();
     setDropdownOpen(false);
     setMobileMenuOpen(false);
-    toast.success('Logged out successfully. See you next time!');
-    router.push('/');
+    setShowLogoutModal(true);
+    setTimeout(() => {
+      logout();
+      setShowLogoutModal(false);
+      toast.success('Logged out successfully. The civic light rests until your return!');
+      router.push('/');
+    }, 2000);
   };
 
   const navLinks = [
@@ -376,6 +382,8 @@ export default function Navbar() {
           </div>
         </div>
       )}
+      {/* Logout Light-Out Animation Modal */}
+      <CivicAuthLightModal isOpen={showLogoutModal} mode="logout" userName={user?.name} />
     </header>
   );
 }
