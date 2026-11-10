@@ -11,9 +11,13 @@ import {
   LogIn,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CivicAuthLightModal from '@/components/animations/CivicAuthLightModal';
+import ButterflyLoginFormAnimation, {
+  ButterflyState,
+} from '@/components/animations/ButterflyLoginFormAnimation';
 
 function LoginFormContent() {
   const { login } = useAuth();
@@ -25,11 +29,13 @@ function LoginFormContent() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [butterflyState, setButterflyState] = useState<ButterflyState>('resting');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
+      setButterflyState('failed');
       toast.error('Please enter both your email and password.');
       return;
     }
@@ -39,20 +45,27 @@ function LoginFormContent() {
     setLoading(false);
 
     if (result.success) {
+      setButterflyState('success');
       setShowLoginModal(true);
       toast.success(result.message || 'Logged in successfully! Welcome back.');
       setTimeout(() => {
         router.push(redirectUrl);
       }, 1800);
     } else {
+      setButterflyState('failed');
       toast.error(result.message || 'Invalid email or password.');
     }
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white dark:bg-gray-900 p-8 sm:p-10 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-xl">
-        
+      <div className="relative w-full max-w-md space-y-8 bg-white dark:bg-gray-900 p-8 sm:p-10 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-visible">
+        {/* Interactive Butterfly 3D Resting / Flying / Success / Failed Animation */}
+        <ButterflyLoginFormAnimation
+          state={butterflyState}
+          onReset={() => setButterflyState('resting')}
+        />
+
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
@@ -77,7 +90,10 @@ function LoginFormContent() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (butterflyState === 'failed') setButterflyState('resting');
+                }}
                 placeholder="name@example.com"
                 required
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
@@ -94,7 +110,10 @@ function LoginFormContent() {
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (butterflyState === 'failed') setButterflyState('resting');
+                }}
                 placeholder="••••••••"
                 required
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
@@ -131,7 +150,10 @@ function LoginFormContent() {
         <button
           type="button"
           onClick={() => {
-            window.location.href = '/api/auth/google/login';
+            setButterflyState('success');
+            setTimeout(() => {
+              window.location.href = '/api/auth/google/login';
+            }, 750);
           }}
           className="w-full py-3 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-3 transition-all shadow-xs hover:shadow-md cursor-pointer group"
         >
@@ -155,6 +177,70 @@ function LoginFormContent() {
           </svg>
           <span>Continue with Google</span>
         </button>
+
+        {/* Interactive Butterfly State Preview Bar */}
+        <div className="pt-3 border-t border-gray-100 dark:border-gray-800/80">
+          <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 mb-2 font-medium">
+            <span className="inline-flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+              <span>Interactive Butterfly Animation:</span>
+            </span>
+            <span className="capitalize text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50">
+              State: {butterflyState}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setButterflyState('flying')}
+              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
+                butterflyState === 'flying'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+              }`}
+              title="Butterflies fly gracefully around login card"
+            >
+              🦋 Fly
+            </button>
+            <button
+              type="button"
+              onClick={() => setButterflyState('resting')}
+              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
+                butterflyState === 'resting'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+              }`}
+              title="Butterflies rest gently on top edge of card"
+            >
+              🌿 Rest
+            </button>
+            <button
+              type="button"
+              onClick={() => setButterflyState('success')}
+              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
+                butterflyState === 'success'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
+              }`}
+              title="Simulate Login Success: Butterflies gracefully fly away off-screen"
+            >
+              ✨ Success
+            </button>
+            <button
+              type="button"
+              onClick={() => setButterflyState('failed')}
+              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
+                butterflyState === 'failed'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60'
+              }`}
+              title="Simulate Login Failed: Butterflies immediately vanish/dissolve"
+            >
+              💥 Failed
+            </button>
+          </div>
+        </div>
 
         {/* Redirect to Register Page */}
         <p className="text-center text-xs text-gray-600 dark:text-gray-400">

@@ -227,6 +227,87 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 /* ==========================================================================
+   Interactive Butterfly 3D Flight & State Animations
+   ========================================================================== */
+
+@keyframes butterflyFlapLeft {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(70deg); }
+  100% { transform: rotateY(-25deg); }
+}
+
+@keyframes butterflyFlapRight {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(-70deg); }
+  100% { transform: rotateY(25deg); }
+}
+
+@keyframes butterflyRestLeft {
+  0%, 100% { transform: rotateY(20deg); }
+  45% { transform: rotateY(25deg); }
+  50% { transform: rotateY(55deg); }
+  55% { transform: rotateY(18deg); }
+  85% { transform: rotateY(24deg); }
+}
+
+@keyframes butterflyRestRight {
+  0%, 100% { transform: rotateY(-20deg); }
+  45% { transform: rotateY(-25deg); }
+  50% { transform: rotateY(-55deg); }
+  55% { transform: rotateY(-18deg); }
+  85% { transform: rotateY(-24deg); }
+}
+
+@keyframes butterflyGentleFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
+}
+
+@keyframes butterflyFlyAway1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+  25% { transform: translate(-40px, -70px) scale(0.92) rotate(-18deg); opacity: 0.95; }
+  55% { transform: translate(-140px, -220px) scale(0.72) rotate(-35deg); opacity: 0.85; }
+  100% { transform: translate(-380px, -520px) scale(0.3) rotate(-55deg); opacity: 0; }
+}
+
+@keyframes butterflyFlyAway2 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+  25% { transform: translate(50px, -80px) scale(0.92) rotate(20deg); opacity: 0.95; }
+  55% { transform: translate(160px, -240px) scale(0.72) rotate(40deg); opacity: 0.85; }
+  100% { transform: translate(420px, -540px) scale(0.3) rotate(60deg); opacity: 0; }
+}
+
+@keyframes butterflyFlyAway3 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+  20% { transform: translate(15px, -90px) scale(0.92) rotate(5deg); opacity: 0.95; }
+  60% { transform: translate(-30px, -280px) scale(0.68) rotate(-15deg); opacity: 0.8; }
+  100% { transform: translate(60px, -620px) scale(0.25) rotate(25deg); opacity: 0; }
+}
+
+@keyframes butterflyDissolve {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.25) rotate(-10deg);
+    filter: brightness(2) blur(1px) drop-shadow(0 0 12px rgba(239, 68, 68, 0.9));
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(0.7) rotate(25deg);
+    filter: brightness(2.5) blur(6px) drop-shadow(0 0 20px rgba(239, 68, 68, 0.7));
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(0.05) rotate(-45deg);
+    filter: brightness(3.5) blur(18px);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
    Magnetic Steel Tactile Button System
    Physics: Magnetic attraction & acceleration on hover, snap latch on click
    ========================================================================== */
