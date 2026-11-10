@@ -23,6 +23,11 @@ import {
   Camera,
   Upload,
   RefreshCw,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -224,6 +229,65 @@ export default function ProfilePage() {
     }
   };
 
+  // Change Password state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newPassword) {
+      toast.error('Please enter your new password.');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long.');
+      return;
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      toast.error('New password must contain at least one uppercase letter (A-Z).');
+      return;
+    }
+
+    if (!/[a-z]/.test(newPassword)) {
+      toast.error('New password must contain at least one lowercase letter (a-z).');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match. Please verify.');
+      return;
+    }
+
+    try {
+      setChangingPassword(true);
+      const res = await profileAPI.changePassword({
+        currentPassword: currentPassword.trim(),
+        newPassword: newPassword.trim(),
+      });
+
+      if (res.success) {
+        toast.success(res.message || 'Password changed successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        toast.error(res.message || 'Failed to change password.');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to change password.');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-8">
@@ -331,8 +395,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Right Column: Update Profile Form */}
-            <div className="md:col-span-7">
+            {/* Right Column: Update Profile Form & Security */}
+            <div className="md:col-span-7 space-y-6">
               <div className="p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-6">
                 <div className="flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-800">
                   <Edit className="w-5 h-5 text-emerald-600" />
@@ -493,6 +557,124 @@ export default function ProfilePage() {
                       <>
                         <Save className="w-4 h-4" />
                         <span>Save Profile Changes</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Change Password Card */}
+              <div className="p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                      Change Password
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Update your account password with a strong, secure combination
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  {/* Current Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                      Current Password (if applicable)
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                        tabIndex={-1}
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* New Password & Confirm Password */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                        New Password *
+                      </label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Min. 6 chars (A-Z, a-z)"
+                          required
+                          className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                        Confirm New Password *
+                      </label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Re-enter new password"
+                          required
+                          className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Requirements Hint */}
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-[11px] text-emerald-800 dark:text-emerald-300">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Password requirements: at least 6 characters, containing both uppercase (A-Z) and lowercase (a-z) letters.</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={changingPassword}
+                    className="w-full btn-magnetic btn-steel-secondary py-3 px-4 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  >
+                    {changingPassword ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <KeyRound className="w-4 h-4" />
+                        <span>Update Password</span>
                       </>
                     )}
                   </button>

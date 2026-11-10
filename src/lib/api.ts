@@ -190,4 +190,10 @@ export const profileAPI = {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
+
+  changePassword: (payload: { currentPassword?: string; newPassword: string }) =>
+    apiRequest<{ success: boolean; message: string }>('/profile/change-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };
