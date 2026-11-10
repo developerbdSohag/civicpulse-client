@@ -129,7 +129,7 @@ function EventsContent() {
         </Link>
       </div>
 
-      {/* Interactive Movable Animation Banner: All Civic Categories */}
+      {/* Interactive Civic Action Information Banner */}
       <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-indigo-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md">
@@ -138,14 +138,14 @@ function EventsContent() {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Interactive Civic Action Simulator
+                Live Community Drives with Verified Animations
               </h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
-                All 6 Categories Animated
+                Click Any Event To Watch
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Watch step-by-step animations: Giving donations to the needy, cleaning dirty places, tree growth from seed to harvest, healthcare healing, literacy, and flood rescue!
+              Click on any event below to experience its animated story: giving warm clothes to the needy, cleaning dirty waters, tree plantation, and healthcare!
             </p>
           </div>
         </div>
@@ -157,10 +157,10 @@ function EventsContent() {
             setSelectedAnimCategory(catKey);
             setShowCategoryModal(true);
           }}
-          className="btn-magnetic btn-steel-primary px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-2 shadow-sm cursor-pointer"
+          className="btn-magnetic btn-steel-secondary px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-2 shadow-sm cursor-pointer border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
         >
-          <Sparkles className="w-4 h-4 text-emerald-200" />
-          <span>Launch Category Animations</span>
+          <Sparkles className="w-4 h-4 text-emerald-500" />
+          <span>Category Simulator</span>
         </button>
       </div>
 
@@ -225,10 +225,6 @@ function EventsContent() {
                 type="button"
                 onClick={() => {
                   setSelectedType(cat);
-                  if (cat !== 'All') {
-                    setSelectedAnimCategory(cat as CivicCategoryKey);
-                    setShowCategoryModal(true);
-                  }
                 }}
                 className={`btn-magnetic px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
                   selectedType === cat

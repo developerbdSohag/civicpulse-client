@@ -132,24 +132,20 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
                 <Link
-                  href="/events"
+                  href="#recent-events"
                   className="w-full sm:w-auto btn-magnetic btn-steel-primary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold shadow-lg"
                 >
                   <CalendarCheck className="w-5 h-5" />
                   <span>Explore Upcoming Events</span>
                 </Link>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedAnimCategory('Plantation');
-                    setShowCategoryModal(true);
-                  }}
+                <Link
+                  href="/events"
                   className="w-full sm:w-auto btn-magnetic btn-steel-secondary gap-2.5 px-6 py-3.5 rounded-xl text-base font-bold cursor-pointer border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:border-emerald-400"
                 >
-                  <Sparkles className="w-5 h-5 text-emerald-500" />
-                  <span>Civic Animations (All 6 Categories)</span>
-                </button>
+                  <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span>View All Events</span>
+                </Link>
               </div>
 
               {/* Trust Indicators */}
@@ -271,7 +267,7 @@ export default function HomePage() {
       </section>
 
       {/* 3. RECENT UPCOMING EVENTS SECTION (Dynamic from MongoDB with .limit(6)) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="recent-events" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">

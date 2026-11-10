@@ -31,9 +31,11 @@ import {
   AlertTriangle,
   ImageIcon,
   FileText,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { saveCommunityEvent, removeCommunityEvent, getCommunityEvents } from '@/lib/communityEvents';
+import CivicCategoryAnimationModal, { mapEventTypeToCategory } from '@/components/animations/CivicCategoryAnimationModal';
 
 const EVENT_TYPES = [
   'Donation',
@@ -56,6 +58,7 @@ export default function EventDetailsClient({ id }: { id: string }) {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showAnimationModal, setShowAnimationModal] = useState(false);
 
   // Edit Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -388,6 +391,37 @@ export default function EventDetailsClient({ id }: { id: string }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Event Impact Animation Banner */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-indigo-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-md">
+            <Sparkles className="w-5 h-5 text-emerald-200 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                {event.eventType} Impact Animation
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                Interactive Simulation
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+              Watch the step-by-step community transformation for this {event.eventType.toLowerCase()} drive.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowAnimationModal(true)}
+          className="btn-magnetic btn-steel-primary px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-2 shadow-sm cursor-pointer"
+        >
+          <Sparkles className="w-4 h-4 text-emerald-200" />
+          <span>Watch {event.eventType} Animation</span>
+        </button>
       </div>
 
       {/* Main Grid: Description + Action Sidebar */}
@@ -815,6 +849,21 @@ export default function EventDetailsClient({ id }: { id: string }) {
           </div>
         </div>
       )}
+
+      {/* Interactive Category Impact Animation Modal for this Event */}
+      <CivicCategoryAnimationModal
+        isOpen={showAnimationModal}
+        onClose={() => setShowAnimationModal(false)}
+        initialCategory={mapEventTypeToCategory(event.eventType)}
+        eventContext={{
+          _id: event._id,
+          title: event.title,
+          location: event.location,
+          eventDate: event.eventDate,
+          thumbnail: event.thumbnail,
+          eventType: event.eventType,
+        }}
+      />
     </div>
   );
 }

@@ -27,10 +27,32 @@ export type CivicCategoryKey =
   | 'Education'
   | 'Relief Aid';
 
+export function mapEventTypeToCategory(eventType?: string): CivicCategoryKey {
+  if (!eventType) return 'Plantation';
+  const lower = eventType.toLowerCase();
+  if (lower.includes('plant') || lower.includes('tree') || lower.includes('sapling')) return 'Plantation';
+  if (lower.includes('donat') || lower.includes('cloth') || lower.includes('blanket') || lower.includes('winter')) return 'Donation';
+  if (lower.includes('clean') || lower.includes('waste') || lower.includes('lake') || lower.includes('park')) return 'Cleanup';
+  if (lower.includes('health') || lower.includes('medic') || lower.includes('doctor') || lower.includes('eye')) return 'Healthcare';
+  if (lower.includes('educat') || lower.includes('school') || lower.includes('book') || lower.includes('literacy')) return 'Education';
+  if (lower.includes('relief') || lower.includes('flood') || lower.includes('food') || lower.includes('aid')) return 'Relief Aid';
+  return 'Donation';
+}
+
+export interface EventContextInfo {
+  _id: string;
+  title: string;
+  location: string;
+  eventDate: string;
+  thumbnail?: string;
+  eventType?: string;
+}
+
 interface CivicCategoryAnimationModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialCategory?: CivicCategoryKey;
+  eventContext?: EventContextInfo | null;
   onExploreCategory?: (category: CivicCategoryKey) => void;
 }
 
@@ -55,20 +77,31 @@ export default function CivicCategoryAnimationModal({
   isOpen,
   onClose,
   initialCategory = 'Plantation',
+  eventContext,
   onExploreCategory,
 }: CivicCategoryAnimationModalProps) {
-  const [activeCategory, setActiveCategory] = useState<CivicCategoryKey>(initialCategory);
+  const getEffectiveCategory = () => {
+    if (eventContext?.eventType) {
+      return mapEventTypeToCategory(eventContext.eventType);
+    }
+    return initialCategory;
+  };
+
+  const [activeCategory, setActiveCategory] = useState<CivicCategoryKey>(getEffectiveCategory());
   const [currentStage, setCurrentStage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
 
-  // Sync category on open
+  // Sync category on open or eventContext change
   useEffect(() => {
     if (isOpen) {
-      setActiveCategory(initialCategory);
+      const cat = eventContext?.eventType
+        ? mapEventTypeToCategory(eventContext.eventType)
+        : initialCategory;
+      setActiveCategory(cat);
       setCurrentStage(0);
       setIsPlaying(true);
     }
-  }, [isOpen, initialCategory]);
+  }, [isOpen, initialCategory, eventContext]);
 
   // Reset stage when switching category
   const handleSelectCategory = (cat: CivicCategoryKey) => {
@@ -926,16 +959,18 @@ export default function CivicCategoryAnimationModal({
               <IconComp className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                  Civic Action Animated Impact
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white line-clamp-1 max-w-sm sm:max-w-md">
+                  {eventContext ? eventContext.title : 'Civic Action Animated Impact'}
                 </h3>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
-                  Interactive Simulator
+                  {eventContext ? `${currentConfig.label} Animation` : 'Interactive Simulator'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Witness real social transformation from initiative to lasting community impact
+                {eventContext
+                  ? `Location: ${eventContext.location} • Step-by-step initiative impact`
+                  : 'Witness real social transformation from initiative to lasting community impact'}
               </p>
             </div>
           </div>
@@ -1094,22 +1129,36 @@ export default function CivicCategoryAnimationModal({
 
           {/* Action CTAs */}
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                if (onExploreCategory) {
-                  onExploreCategory(activeCategory);
-                } else {
-                  window.location.href = `/events?type=${encodeURIComponent(activeCategory)}`;
-                }
-              }}
-              className="w-full sm:w-auto btn-magnetic btn-steel-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
-            >
-              <IconComp className="w-4 h-4" />
-              <span>Explore {currentConfig.label} Events</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {eventContext ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  window.location.href = `/events/${eventContext._id}`;
+                }}
+                className="w-full sm:w-auto btn-magnetic btn-steel-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              >
+                <span>Proceed to Event Details &amp; RSVP</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onExploreCategory) {
+                    onExploreCategory(activeCategory);
+                  } else {
+                    window.location.href = `/events?type=${encodeURIComponent(activeCategory)}`;
+                  }
+                }}
+                className="w-full sm:w-auto btn-magnetic btn-steel-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              >
+                <IconComp className="w-4 h-4" />
+                <span>Explore {currentConfig.label} Events</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
