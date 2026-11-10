@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { joinEvent, leaveEvent, verifyAuthToken, findUserById } from '@/server/store';
+import { joinEvent, leaveEvent, verifyAuthToken, findUserByIdOrToken } from '@/server/store';
 
 export async function POST(
   req: Request,
@@ -14,17 +14,13 @@ export async function POST(
       );
     }
 
-    const user = findUserById(auth.id);
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found.' }, { status: 404 });
-    }
-
+    const user = findUserByIdOrToken(auth);
     const { id } = await context.params;
     const result = joinEvent(id, {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      photoURL: user.photoURL,
+      id: user.id || auth.id,
+      email: user.email || auth.email,
+      name: user.name || auth.name || 'Volunteer',
+      photoURL: user.photoURL || auth.photoURL,
     });
 
     return NextResponse.json({

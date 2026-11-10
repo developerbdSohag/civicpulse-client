@@ -6,6 +6,8 @@ import { EventItem, RSVPItem, User, Attendee } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'civicpulse_jwt_secret_key_secure_2026_social_platform';
 const CACHE_FILE = path.join(process.env.TEMP || process.env.TMPDIR || '/tmp', 'civicpulse_events_cache.json');
+const CACHE_USERS_FILE = path.join(process.env.TEMP || process.env.TMPDIR || '/tmp', 'civicpulse_users_cache.json');
+const CACHE_RSVP_FILE = path.join(process.env.TEMP || process.env.TMPDIR || '/tmp', 'civicpulse_rsvps_cache.json');
 
 function persistEventsToFile(eventsMap: Map<string, EventItem>) {
   try {
@@ -23,6 +25,52 @@ function restoreEventsFromFile(eventsMap: Map<string, EventItem>) {
         for (const ev of list) {
           if (ev && ev._id) {
             eventsMap.set(ev._id, ev);
+          }
+        }
+      }
+    }
+  } catch (_) {}
+}
+
+function persistUsersToFile(usersMap: Map<string, StoredUser>) {
+  try {
+    const list = Array.from(usersMap.values());
+    fs.writeFileSync(CACHE_USERS_FILE, JSON.stringify(list), 'utf8');
+  } catch (_) {}
+}
+
+function restoreUsersFromFile(usersMap: Map<string, StoredUser>) {
+  try {
+    if (fs.existsSync(CACHE_USERS_FILE)) {
+      const raw = fs.readFileSync(CACHE_USERS_FILE, 'utf8');
+      const list: StoredUser[] = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        for (const u of list) {
+          if (u && (u.id || u._id)) {
+            usersMap.set(u.id || u._id!, u);
+          }
+        }
+      }
+    }
+  } catch (_) {}
+}
+
+function persistRSVPsToFile(rsvpsMap: Map<string, RSVPItem>) {
+  try {
+    const list = Array.from(rsvpsMap.values());
+    fs.writeFileSync(CACHE_RSVP_FILE, JSON.stringify(list), 'utf8');
+  } catch (_) {}
+}
+
+function restoreRSVPsFromFile(rsvpsMap: Map<string, RSVPItem>) {
+  try {
+    if (fs.existsSync(CACHE_RSVP_FILE)) {
+      const raw = fs.readFileSync(CACHE_RSVP_FILE, 'utf8');
+      const list: RSVPItem[] = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        for (const r of list) {
+          if (r && r._id) {
+            rsvpsMap.set(r._id, r);
           }
         }
       }
@@ -265,8 +313,10 @@ export function initStore() {
     store.events.set(ev._id, ev);
   }
 
-  // Restore any persistent community events created across sessions
+  // Restore any persistent community events, users, and RSVPs created across sessions
   restoreEventsFromFile(store.events);
+  restoreUsersFromFile(store.users);
+  restoreRSVPsFromFile(store.rsvps);
 
   // Pre-seed RSVP
   const rsvp1: RSVPItem = {
@@ -365,6 +415,7 @@ export function findUserByIdOrToken(auth: AuthUserPayload): StoredUser {
   };
 
   store.users.set(id, restoredUser);
+  persistUsersToFile(store.users);
   return restoredUser;
 }
 
@@ -396,6 +447,7 @@ export function createUser(data: {
     if (data.phone && !existing.phone) existing.phone = data.phone;
     if (data.location && !existing.location) existing.location = data.location;
     store.users.set(existing.id, existing);
+    persistUsersToFile(store.users);
     return existing;
   }
 
@@ -412,6 +464,7 @@ export function createUser(data: {
     createdAt: new Date().toISOString(),
   };
   store.users.set(id, newUser);
+  persistUsersToFile(store.users);
   return newUser;
 }
 
@@ -451,6 +504,7 @@ export function updateUser(idOrEmail: string, updates: Partial<StoredUser>): Sto
   };
 
   store.users.set(updated.id, updated);
+  persistUsersToFile(store.users);
   return updated;
 }
 
@@ -662,13 +716,21 @@ export function getEventsByCreator(email: string): EventItem[] {
 export function joinEvent(eventId: string, user: { id: string; email: string; name: string; photoURL?: string }): { success: boolean; attendeesCount: number } {
   initStore();
   const store = getStore();
-  const event = store.events.get(eventId);
+  let event = store.events.get(eventId);
+  if (!event) {
+    for (const e of store.events.values()) {
+      if (e._id === eventId || e._id === decodeURIComponent(eventId)) {
+        event = e;
+        break;
+      }
+    }
+  }
   if (!event) throw new Error('Event not found');
 
   // Check if already joined
   for (const rsvp of store.rsvps.values()) {
     const eId = typeof rsvp.eventId === 'string' ? rsvp.eventId : (rsvp.eventId as any)?._id;
-    if (eId === eventId && rsvp.userEmail.toLowerCase() === user.email.toLowerCase()) {
+    if (eId === event._id && rsvp.userEmail.toLowerCase() === user.email.toLowerCase()) {
       return { success: true, attendeesCount: event.attendeesCount };
     }
   }
@@ -690,7 +752,9 @@ export function joinEvent(eventId: string, user: { id: string; email: string; na
 
   store.rsvps.set(rsvpId, newRSVP);
   event.attendeesCount += 1;
-  store.events.set(eventId, event);
+  store.events.set(event._id, event);
+  persistEventsToFile(store.events);
+  persistRSVPsToFile(store.rsvps);
 
   return { success: true, attendeesCount: event.attendeesCount };
 }
@@ -698,13 +762,21 @@ export function joinEvent(eventId: string, user: { id: string; email: string; na
 export function leaveEvent(eventId: string, userEmail: string): { success: boolean; attendeesCount: number } {
   initStore();
   const store = getStore();
-  const event = store.events.get(eventId);
+  let event = store.events.get(eventId);
+  if (!event) {
+    for (const e of store.events.values()) {
+      if (e._id === eventId || e._id === decodeURIComponent(eventId)) {
+        event = e;
+        break;
+      }
+    }
+  }
   if (!event) throw new Error('Event not found');
 
   let removed = false;
   for (const [id, rsvp] of store.rsvps.entries()) {
     const eId = typeof rsvp.eventId === 'string' ? rsvp.eventId : (rsvp.eventId as any)?._id;
-    if (eId === eventId && rsvp.userEmail.toLowerCase() === userEmail.toLowerCase()) {
+    if (eId === event._id && rsvp.userEmail.toLowerCase() === userEmail.toLowerCase()) {
       store.rsvps.delete(id);
       removed = true;
       break;
@@ -713,7 +785,9 @@ export function leaveEvent(eventId: string, userEmail: string): { success: boole
 
   if (removed && event.attendeesCount > 0) {
     event.attendeesCount -= 1;
-    store.events.set(eventId, event);
+    store.events.set(event._id, event);
+    persistEventsToFile(store.events);
+    persistRSVPsToFile(store.rsvps);
   }
 
   return { success: true, attendeesCount: event.attendeesCount };
