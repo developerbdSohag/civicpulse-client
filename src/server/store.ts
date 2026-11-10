@@ -154,6 +154,32 @@ export function initStore() {
   };
 
   const user3: StoredUser = {
+    id: 'user_sohag_gmail',
+    _id: 'user_sohag_gmail',
+    name: 'Sohag',
+    email: 'sohag@gmail.com',
+    password: hashedPassword,
+    photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    bio: 'Community volunteer passionate about making local impact.',
+    location: 'Dhaka, Bangladesh',
+    phone: '01759765387',
+    createdAt: new Date().toISOString(),
+  };
+
+  const user4: StoredUser = {
+    id: 'user_sohag_official',
+    _id: 'user_sohag_official',
+    name: 'Sohag',
+    email: 'mdsalahuddinsohag218@gmail.com',
+    password: hashedPassword,
+    photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    bio: 'Community volunteer passionate about making local impact.',
+    location: 'Dhaka, Bangladesh',
+    phone: '01759765387',
+    createdAt: new Date().toISOString(),
+  };
+
+  const user5: StoredUser = {
     id: 'user_sohag',
     _id: 'user_sohag',
     name: 'Md. Salahuddin Sohag',
@@ -169,6 +195,8 @@ export function initStore() {
   store.users.set(user1.id, user1);
   store.users.set(user2.id, user2);
   store.users.set(user3.id, user3);
+  store.users.set(user4.id, user4);
+  store.users.set(user5.id, user5);
 
   // Seed Events with future dates
   const now = new Date();
