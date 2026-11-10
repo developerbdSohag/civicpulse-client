@@ -11,7 +11,6 @@ import {
   LogIn,
   ArrowRight,
   Loader2,
-  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CivicAuthLightModal from '@/components/animations/CivicAuthLightModal';
@@ -177,70 +176,6 @@ function LoginFormContent() {
           </svg>
           <span>Continue with Google</span>
         </button>
-
-        {/* Interactive Butterfly State Preview Bar */}
-        <div className="pt-3 border-t border-gray-100 dark:border-gray-800/80">
-          <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 mb-2 font-medium">
-            <span className="inline-flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-              <span>Interactive Butterfly Animation:</span>
-            </span>
-            <span className="capitalize text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50">
-              State: {butterflyState}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setButterflyState('flying')}
-              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
-                butterflyState === 'flying'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-              title="Butterflies fly gracefully around login card"
-            >
-              🦋 Fly
-            </button>
-            <button
-              type="button"
-              onClick={() => setButterflyState('resting')}
-              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
-                butterflyState === 'resting'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-              title="Butterflies rest gently on top edge of card"
-            >
-              🌿 Rest
-            </button>
-            <button
-              type="button"
-              onClick={() => setButterflyState('success')}
-              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
-                butterflyState === 'success'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60'
-              }`}
-              title="Simulate Login Success: Butterflies gracefully fly away off-screen"
-            >
-              ✨ Success
-            </button>
-            <button
-              type="button"
-              onClick={() => setButterflyState('failed')}
-              className={`py-1.5 px-1.5 rounded-lg font-medium transition-all text-center cursor-pointer ${
-                butterflyState === 'failed'
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60'
-              }`}
-              title="Simulate Login Failed: Butterflies immediately vanish/dissolve"
-            >
-              💥 Failed
-            </button>
-          </div>
-        </div>
 
         {/* Redirect to Register Page */}
         <p className="text-center text-xs text-gray-600 dark:text-gray-400">
